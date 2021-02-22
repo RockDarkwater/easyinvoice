@@ -1,7 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.easyinvoice2">
+    package="com.example.easyinvoice">
    <application
-        android:label="easyinvoice2"
+        android:label="easyinvoice"
         android:icon="@mipmap/ic_launcher">
         <activity
             android:name=".MainActivity"

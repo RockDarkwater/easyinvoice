@@ -1,4 +1,3 @@
-import 'package:easyinvoice2/models/item.dart';
 import 'package:excel/excel.dart';
 
 import 'billable_item.dart';

@@ -1,4 +1,4 @@
-package com.example.easyinvoice2
+package com.example.easyinvoice
 
 import io.flutter.embedding.android.FlutterActivity
 

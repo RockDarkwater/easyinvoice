@@ -1,4 +1,4 @@
-# easyinvoice2
+# easyinvoice
 
 A new Flutter project.
 
