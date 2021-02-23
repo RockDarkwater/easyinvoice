@@ -1,8 +1,20 @@
+import 'package:easyinvoice/components/firebase_curation_functions.dart';
 import 'package:flutter/material.dart';
 
 // Import the firebase_core plugin
 import 'package:firebase_core/firebase_core.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+
+// Todo:
+// - function to upload items from HMC Item List
+// - function to upload customers from customer list
+// - function to upload services from service list
+// - function to create service price collection for customers
+// - ui to interact with customers, prices, items, and services.
+
+// - import for AMIS, Work Ticket, and Accugas data into locally stored sql table.
+// - invoice template
+// - link to local email program, or method to send from "invoicing@howardmeasurement.com"
+// - ADP and QB export files.
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -10,7 +22,7 @@ void main() {
 }
 
 class App extends StatelessWidget {
-  // Create the initialization Future outside of `build`:
+  // Create the firebase initialization Future outside of `build`:
   final Future<FirebaseApp> _initialization = Firebase.initializeApp();
 
   @override
@@ -21,7 +33,7 @@ class App extends StatelessWidget {
       builder: (context, snapshot) {
         // Check for errors
         if (snapshot.hasError) {
-          return Text('error');
+          return Container(alignment: Alignment.center, child: Text('error'));
         }
 
         // Once complete, show your application
@@ -29,7 +41,7 @@ class App extends StatelessWidget {
           return MyApp();
         }
 
-        // Otherwise, show something whilst waiting for initialization to complete
+        // Otherwise, show progress indicator whilst waiting for initialization to complete
         return CircularProgressIndicator();
       },
     );
@@ -63,24 +75,7 @@ class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
 
   void _incrementCounter() async {
-    FirebaseFirestore firestore = FirebaseFirestore.instance;
-
-    //loop to delete items in a collection
-    QuerySnapshot docsToDelete = await firestore.collection('testWrite').get();
-    WriteBatch writeBatch = firestore.batch();
-    docsToDelete.docs.forEach((doc) {
-      DocumentReference docRef = firestore.collection('testWrite').doc(doc.id);
-
-      writeBatch.delete(docRef);
-    });
-    // Only 500 actions in a commit
-    await writeBatch.commit();
-    // firestore
-    //     .collection('testWrite')
-    //     .doc('counterdoc' + _counter.toString())
-    //     .set({
-    //   'counterNumber': _counter.toString(),
-    // });
+    await refreshItems();
     setState(() {
       _counter++;
     });
