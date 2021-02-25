@@ -9,11 +9,13 @@ class Job {
   String requisitioner;
   String location;
 
-  Job.fromWorkTicket(Excel excel){
-    excel.sheets[0].rows.first;
-  };
+  Job(this.customer, this.techName, this.jobDate);
 
-  Job.fromAmis(List<dynamic> row);
+  // Job.fromWorkTicket(Excel excel){
+  //   excel.sheets[0].rows.first;
+  // };
 
-  Job.fromAccugas(List<dynamic> row);
+  // Job.fromAmis(List<dynamic> row);
+
+  // Job.fromAccugas(List<dynamic> row);
 }

@@ -115,44 +115,63 @@ Future<void> uploadCustomers() async {
     var _itemSheet = _excel.sheets[_excel.sheets.keys.first];
 
     await batchDelete('customers');
+    print('customers list deleted');
 
-    FirebaseFirestore fbfs = FirebaseFirestore.instance;
+    FirebaseFirestore firebase = FirebaseFirestore.instance;
     // change to for loop, commit every 500 customers
-    WriteBatch batch = fbfs.batch();
 
-    _itemSheet.rows.forEach((row) {
-      Map rowMap = row.asMap();
+    int loops = (_itemSheet.maxRows ~/ 500) + 1;
+    print('running ${_itemSheet.maxRows} times: $loops loops');
 
-      if (rowMap[0] != 'ID') {
-        batch.set(fbfs.collection('customers').doc('${rowMap[2].toString()}'), {
-          'billingName': rowMap[3],
-          'parentCustomer': rowMap[1],
-          'add1': rowMap[4] ?? '',
-          'add2': rowMap[5] ?? '',
-          'add3': rowMap[6] ?? '',
-          'city': rowMap[7] ?? '',
-          'state': rowMap[8] ?? '',
-          'zip': rowMap[9] ?? '',
-          'ccFee': rowMap[12].toString().toLowerCase() == 'no' ? false : true,
-          'requisitioner': rowMap[13],
-          'poNum': rowMap[14] ?? '',
-          'fieldArea': rowMap[15] ?? '',
-          'taxRate': rowMap[16] ?? 8.25,
-          'custClass': rowMap[17] ?? '',
-          'billingDeets': rowMap[18] ?? '',
-          'distList': rowMap[19] ?? '',
-          'fieldMethod': rowMap[20] ?? 'byLease',
-          'noChargeArray': rowMap[21] ?? '',
-          'convertArray': rowMap[22] ?? '',
-        });
-        print('added: ${rowMap[3]}');
+    int currentMax;
+    int j = 0;
+    WriteBatch batch;
+    Map<int, List<dynamic>> rowIndex;
+    Map<int, dynamic> rowMap;
+
+    for (int i = 0; i <= loops; i++) {
+      (i * 500 > _itemSheet.maxRows)
+          ? currentMax = _itemSheet.maxRows
+          : currentMax = i * 500;
+      batch = firebase.batch();
+      rowIndex = _itemSheet.rows.asMap();
+      print('starting at $j');
+
+      for (j; j < currentMax; j++) {
+        rowMap = rowIndex[j].asMap();
+
+        if (rowMap[0] != 'ID') {
+          batch.set(
+              firebase.collection('customers').doc('${rowMap[2].toString()}'), {
+            'billingName': rowMap[3],
+            'parentCustomer': rowMap[1],
+            'add1': rowMap[4] ?? '',
+            'add2': rowMap[5] ?? '',
+            'add3': rowMap[6] ?? '',
+            'city': rowMap[7] ?? '',
+            'state': rowMap[8] ?? '',
+            'zip': rowMap[9] ?? '',
+            'ccFee': rowMap[12].toString().toLowerCase() == 'no' ? false : true,
+            'requisitioner': rowMap[13],
+            'poNum': rowMap[14] ?? '',
+            'fieldArea': rowMap[15] ?? '',
+            'taxRate': rowMap[16] ?? 8.25,
+            'custClass': rowMap[17] ?? '',
+            'billingDeets': rowMap[18] ?? '',
+            'distList': rowMap[19] ?? '',
+            'fieldMethod': rowMap[20] ?? 'byLease',
+            'noChargeArray': rowMap[21] ?? '',
+            'convertArray': rowMap[22] ?? '',
+          });
+          print('added: ${rowMap[3]}');
+        }
       }
-    });
-
-    try {
-      return batch.commit();
-    } catch (err) {
-      return print('error uploading services: $err');
+      try {
+        j += 1;
+        await batch.commit();
+      } catch (err) {
+        print('error uploading services: $err');
+      }
     }
   }
 }
