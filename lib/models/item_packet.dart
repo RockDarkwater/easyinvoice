@@ -1,6 +1,7 @@
 import 'package:excel/excel.dart';
 
 import 'billable_item.dart';
+import 'item.dart';
 
 class BillableItemPacket {
   List<BillableItem> items = [];
@@ -16,6 +17,7 @@ class BillableItemPacket {
     Sheet sheet = data.sheets[data.sheets.keys.first];
     // test that all rows are recognized
     int rows = sheet.maxRows;
+    int counter = 0;
     print('total rows in ${sheet.sheetName}: $rows');
 
     // create a billable item for each
@@ -23,29 +25,31 @@ class BillableItemPacket {
       String item = sheet
           .cell(CellIndex.indexByColumnRow(columnIndex: 14, rowIndex: i))
           .value;
-      // Item lineItem = Item.fromFirebase(sampleType(item).toString());
+      Item lineItem = Item.fromFirebase(sampleType(item).toString());
 
-      // if (i > 0) {
-      //   items.add(BillableItem(
-      //       sheet
-      //           .cell(CellIndex.indexByColumnRow(columnIndex: 2, rowIndex: i))
-      //           .value,
-      //       sheet
-      //           .cell(CellIndex.indexByColumnRow(columnIndex: 3, rowIndex: i))
-      //           .value,
-      //       sheet
-      //           .cell(CellIndex.indexByColumnRow(columnIndex: 5, rowIndex: i))
-      //           .value,
-      //       sheet
-      //           .cell(CellIndex.indexByColumnRow(columnIndex: 54, rowIndex: i))
-      //           .value,
-      //       sheet
-      //           .cell(CellIndex.indexByColumnRow(columnIndex: 10, rowIndex: i))
-      //           .value,
-      //       1,
-      //       lineItem));
-      // }
+      if (i > 0) {
+        items.add(BillableItem(
+            sheet
+                .cell(CellIndex.indexByColumnRow(columnIndex: 2, rowIndex: i))
+                .value,
+            sheet
+                .cell(CellIndex.indexByColumnRow(columnIndex: 3, rowIndex: i))
+                .value,
+            sheet
+                .cell(CellIndex.indexByColumnRow(columnIndex: 5, rowIndex: i))
+                .value,
+            sheet
+                .cell(CellIndex.indexByColumnRow(columnIndex: 54, rowIndex: i))
+                .value,
+            sheet
+                .cell(CellIndex.indexByColumnRow(columnIndex: 10, rowIndex: i))
+                .value,
+            1,
+            lineItem));
+      }
+      counter++;
     }
+    print('$counter items created from upload');
   }
 
   int sampleType(String type) {
