@@ -10,42 +10,149 @@ Future<void> refreshItems() async {
     // User canceled the picker
     print('null pick');
   } else {
-    var _filePath = "C:\Anal\HFS Item List.xlsx";
+    // var _filePath = "C:\Anal\HFS Item List.xlsx";
     var _excel = Excel.decodeBytes(result.files.first.bytes);
     var _itemSheet = _excel.sheets[_excel.sheets.keys.last];
 
-    // Loop to delete all items in items collection
-    // FirebaseFirestore firestore = FirebaseFirestore.instance;
-    // QuerySnapshot docsToDelete = await firestore.collection('items').get();
-    // WriteBatch writeBatch = firestore.batch();
-    // docsToDelete.docs.forEach((doc) {
-    //   DocumentReference docRef = firestore.collection('testWrite').doc(doc.id);
+    // delete all items in items collection
+    await batchDelete('items');
+    print('items deleted');
 
-    //   writeBatch.delete(docRef);
-    // });
-    // // Only 500 actions in a commit
-    // await writeBatch.commit();
+    // add items from spreadsheet
+    writeItems(_itemSheet);
+    print('items refreshed');
+  }
+}
 
-    // check if row is an active part
+Future<void> batchDelete(String collectionName) {
+  // Loop to delete all items in items collection
+  FirebaseFirestore firestore = FirebaseFirestore.instance;
+  CollectionReference collection = firestore.collection(collectionName);
+  WriteBatch batch = firestore.batch();
 
-    int activeParts = 0;
-    for (int i = 0; i < _itemSheet.maxRows - 1; i++) {
-      bool activePart = true;
+  return collection.get().then((querySnapshot) {
+    querySnapshot.docs.forEach((doc) {
+      batch.delete(doc.reference);
+    });
 
-      String checkActive = _itemSheet
-          .cell(CellIndex.indexByColumnRow(columnIndex: 1, rowIndex: i + 1))
-          .value
-          .toString();
-      if (checkActive.toLowerCase() != 'active') activePart = false;
-      // print('$checkActive - $isActive');
-      if (activePart) {
-        String itemType = _itemSheet
-            .cell(CellIndex.indexByColumnRow(columnIndex: 2, rowIndex: i + 1))
-            .value;
-        if (!itemType.toLowerCase().contains('part')) activePart = false;
-        if (activePart) activeParts++;
-      }
+    return batch.commit();
+  });
+}
+
+void writeItems(Sheet sheet) {
+  // for each row after 1, code item details to flutterfire batch write
+  FirebaseFirestore fbfs = FirebaseFirestore.instance;
+  WriteBatch batch = fbfs.batch();
+  print('write batch created');
+
+  sheet.rows.forEach((row) {
+    Map rowVals = row.asMap();
+    if (rowVals[1].toString().toLowerCase() == 'active' &&
+        rowVals[2].toString().toLowerCase().contains('part')) {
+      // add values to doc "item code" (D): item name(E), item cost(N), item price(Q)
+      batch.set(fbfs.collection('items').doc('${rowVals[3]}'), {
+        "name": rowVals[4],
+        "cost": rowVals[13],
+        "price": rowVals[16],
+      });
+
+      // print('item: ${rowVals[3]} added to batch');
     }
-    print('total active parts: $activeParts');
+  });
+
+  try {
+    batch.commit();
+  } catch (err) {
+    print('error comitting batch: $err');
+  }
+}
+
+Future<void> uploadServices() async {
+  FilePickerResult result = await FilePicker.platform.pickFiles();
+  if (result == null) {
+    // User canceled the picker
+    print('null pick');
+  } else {
+    // var _filePath = "C:\Anal\HFS Services List.xlsx";
+    var _excel = Excel.decodeBytes(result.files.first.bytes);
+    var _itemSheet = _excel.sheets[_excel.sheets.keys.first];
+
+    await batchDelete('services');
+
+    FirebaseFirestore fbfs = FirebaseFirestore.instance;
+    WriteBatch batch = fbfs.batch();
+
+    _itemSheet.rows.forEach((row) {
+      Map rowMap = row.asMap();
+
+      if (rowMap[0] != 'serviceCode') {
+        batch.set(fbfs.collection('services').doc('${rowMap[3].toString()}'), {
+          'name': rowMap[1],
+          'qbName': rowMap[4],
+          'category': rowMap[2],
+          'workUnits': rowMap[5] ?? 0,
+        });
+        print('added: ${rowMap[1]}');
+      }
+    });
+
+    try {
+      return batch.commit();
+    } catch (err) {
+      return print('error uploading services: $err');
+    }
+  }
+}
+
+Future<void> uploadCustomers() async {
+  FilePickerResult result = await FilePicker.platform.pickFiles();
+  if (result == null) {
+    // User canceled the picker
+    print('null pick');
+  } else {
+    // var _filePath = "C:\Anal\HFS Services List.xlsx";
+    var _excel = Excel.decodeBytes(result.files.first.bytes);
+    var _itemSheet = _excel.sheets[_excel.sheets.keys.first];
+
+    await batchDelete('customers');
+
+    FirebaseFirestore fbfs = FirebaseFirestore.instance;
+    // change to for loop, commit every 500 customers
+    WriteBatch batch = fbfs.batch();
+
+    _itemSheet.rows.forEach((row) {
+      Map rowMap = row.asMap();
+
+      if (rowMap[0] != 'ID') {
+        batch.set(fbfs.collection('customers').doc('${rowMap[2].toString()}'), {
+          'billingName': rowMap[3],
+          'parentCustomer': rowMap[1],
+          'add1': rowMap[4] ?? '',
+          'add2': rowMap[5] ?? '',
+          'add3': rowMap[6] ?? '',
+          'city': rowMap[7] ?? '',
+          'state': rowMap[8] ?? '',
+          'zip': rowMap[9] ?? '',
+          'ccFee': rowMap[12].toString().toLowerCase() == 'no' ? false : true,
+          'requisitioner': rowMap[13],
+          'poNum': rowMap[14] ?? '',
+          'fieldArea': rowMap[15] ?? '',
+          'taxRate': rowMap[16] ?? 8.25,
+          'custClass': rowMap[17] ?? '',
+          'billingDeets': rowMap[18] ?? '',
+          'distList': rowMap[19] ?? '',
+          'fieldMethod': rowMap[20] ?? 'byLease',
+          'noChargeArray': rowMap[21] ?? '',
+          'convertArray': rowMap[22] ?? '',
+        });
+        print('added: ${rowMap[3]}');
+      }
+    });
+
+    try {
+      return batch.commit();
+    } catch (err) {
+      return print('error uploading services: $err');
+    }
   }
 }
