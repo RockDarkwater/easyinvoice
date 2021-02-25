@@ -5,14 +5,15 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 
 // Todo:
-// - function to upload items from HMC Item List
-// - function to upload customers from customer list
-// - function to upload services from service list
+// - upload customers from customer list
 // - function to create service price collection for customers
-// - ui to interact with customers, prices, items, and services.
 
 // - import for AMIS, Work Ticket, and Accugas data into locally stored sql table.
+//    - billable from job, lease info, quantity, and item or service code
+
+// - ui to interact with customers, prices, items, and services.
 // - invoice template
+
 // - link to local email program, or method to send from "invoicing@howardmeasurement.com"
 // - ADP and QB export files.
 

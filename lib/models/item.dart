@@ -5,16 +5,15 @@ class Item {
   String name;
   double price;
   bool taxable;
-
   double cost;
-
-  Item(this.name, this.itemCode, this.price, this.taxable, {this.cost});
 
   Item.fromFirebase(this.itemCode) {
     //look on firebase for the item code, pull item details
-    FirebaseFirestore firestore = FirebaseFirestore.instance;
-
-    firestore.collection('items').doc(this.itemCode).get().then((value) {
+    FirebaseFirestore.instance
+        .collection('items')
+        .doc(this.itemCode)
+        .get()
+        .then((value) {
       this.name = value['name'];
       this.price = value['price'];
       this.cost = value['price'];

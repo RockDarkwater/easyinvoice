@@ -1,10 +1,10 @@
+import 'package:easyinvoice/models/service.dart';
 import 'package:excel/excel.dart';
 
-import 'billable_item.dart';
-import 'item.dart';
+import 'billable.dart';
 
 class BillableItemPacket {
-  List<BillableItem> items = [];
+  List<Billable> items = [];
 
   BillableItemPacket(this.items);
 
@@ -25,56 +25,58 @@ class BillableItemPacket {
       String item = sheet
           .cell(CellIndex.indexByColumnRow(columnIndex: 14, rowIndex: i))
           .value;
-      Item lineItem = Item.fromFirebase(sampleType(item).toString());
+      Service lineItem = Service.fromFirebase(sampleType(item).toString());
 
-      if (i > 0) {
-        items.add(BillableItem(
-            sheet
-                .cell(CellIndex.indexByColumnRow(columnIndex: 2, rowIndex: i))
-                .value,
-            sheet
-                .cell(CellIndex.indexByColumnRow(columnIndex: 3, rowIndex: i))
-                .value,
-            sheet
-                .cell(CellIndex.indexByColumnRow(columnIndex: 5, rowIndex: i))
-                .value,
-            sheet
-                .cell(CellIndex.indexByColumnRow(columnIndex: 54, rowIndex: i))
-                .value,
-            sheet
-                .cell(CellIndex.indexByColumnRow(columnIndex: 10, rowIndex: i))
-                .value,
-            1,
-            lineItem));
-      }
+      //TODO: edit to create Job item from ticket and pass it to billable
+
+      // if (i > 0) {
+      //   items.add(Billable(
+      //       sheet
+      //           .cell(CellIndex.indexByColumnRow(columnIndex: 2, rowIndex: i))
+      //           .value,
+      //       sheet
+      //           .cell(CellIndex.indexByColumnRow(columnIndex: 3, rowIndex: i))
+      //           .value,
+      //       sheet
+      //           .cell(CellIndex.indexByColumnRow(columnIndex: 5, rowIndex: i))
+      //           .value,
+      //       sheet
+      //           .cell(CellIndex.indexByColumnRow(columnIndex: 54, rowIndex: i))
+      //           .value,
+      //       sheet
+      //           .cell(CellIndex.indexByColumnRow(columnIndex: 10, rowIndex: i))
+      //           .value,
+
+      //       lineItem));
+      // }
       counter++;
     }
     print('$counter items created from upload');
   }
 
-  int sampleType(String type) {
+  String sampleType(String type) {
     bool extended = false;
     bool liquid = false;
 
-    if (type.indexOf('recom') > 0) return 53;
-    if (type.indexOf('sulph') > 0) return 54;
-    if (type == "flash") return 55;
+    if (type.indexOf('recom') > 0) return 'recomb';
+    if (type.indexOf('sulph') > 0) return 'sulphur';
+    if (type == "flash") return 'flash';
 
-    if (type == "rvp") return 58;
-    if (type.indexOf('api') > 0) return 60;
+    if (type == "rvp") return 'rvpCalc';
+    if (type.indexOf('api') > 0) return 'apiGrav';
 
-    if (type.indexOf('train') > 0) return 61;
+    if (type.indexOf('train') > 0) return 'training';
 
     if (type.indexOf("ext") > 0) extended = true;
     if (type.indexOf("liq") > 0) liquid = true;
 
     if (extended && liquid) {
-      return 52;
+      return 'extLiquidSample';
     } else if (!extended && liquid) {
-      return 50;
+      return 'c6LiquidSample';
     } else if (extended && !liquid) {
-      return 51;
+      return 'extGasSample';
     } else
-      return 2;
+      return 'c6GasSample';
   }
 }
