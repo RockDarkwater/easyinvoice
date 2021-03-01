@@ -1,11 +1,11 @@
-import 'package:easyinvoice/components/firebase_curation_functions.dart';
-import 'package:easyinvoice/models/station_charge.dart';
 import 'package:excel/excel.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 
 // Import the firebase_core plugin
 import 'package:firebase_core/firebase_core.dart';
+
+import 'models/job.dart';
 
 // Todo:
 // - function to create service price collection for customers
@@ -119,7 +119,17 @@ class _MyHomePageState extends State<MyHomePage> {
       // var _filePath = "C:\Anal\HFS Services List.xlsx";
       var _excel = Excel.decodeBytes(result.files.first.bytes);
       var _itemSheet = _excel.sheets[_excel.sheets.keys.first];
-      return () => {};
+      var test = _itemSheet.cell(CellIndex.indexByString('A11')).value;
+      print('object translated - cell A11 is: $test');
+      Job job;
+
+      if (test == 'Station #') {
+        print('building job...');
+        job = Job.fromWorkTicket(_itemSheet);
+        print('${job.customer} - stationCharges: ${job.stationCharges.length}');
+      } else {
+        print('upload is not a work ticket');
+      }
     }
   }
 }

@@ -10,28 +10,49 @@ class StationCharge {
   Map<dynamic, double> chargeMap = Map();
 
   StationCharge.fromWorkTicket(Sheet workTicket, List<dynamic> row) {
-    // pull number from column A and name from column B.
-    leaseName = row[1].toString();
-    leaseNumber = row[0].toString();
-    poNumber = row[2].toString() ?? '';
+    // pull number from column A, name from column B, and potential PO from C.
+    leaseName = row[1].value.toString();
+    leaseNumber = row[0].value.toString();
+    poNumber = row[2].value.toString() ?? '';
+
+    print('$leaseNumber - $leaseName: type: $poNumber');
 
     // create item map using row 11 as the header and row value as quantity
     //loop until column 12 is empty
     int i = 0;
+    double qty = 0.0;
 
-    while (workTicket.row(10)[i].value != '') {
+    while (workTicket.row(10)[i].value.toString() != '') {
       //starting with column D, map charges until last item in row 11
-      if (row[i].value > 0 && i > 2) {
-        if (i < 11) {
+      if (i > 2) {
+        print(row[i].value.toString());
+        if (i < 11 && row[i].value != null) {
           // create service
-          chargeMap[Service.fromFirebase(workTicket.row(10)[i].value)] =
-              row[i].value;
-        } else {
+          try {
+            if (row[i].cellType == CellType.Formula) {
+              print('sum: ${row[i].sum}');
+            } else {
+              qty = double.parse(row[i].value.toString());
+            }
+
+            if (row[i].cellType == CellType.Formula)
+              chargeMap[Service.fromFirebase(workTicket.row(10)[i].value)] =
+                  qty;
+          } catch (err) {
+            print('couldn\'t build service ${workTicket.row(10)[i].value}');
+          }
+        } else if (row[i].value != null) {
           // create item
-          // ignore: unnecessary_statements
-          chargeMap[Item.fromFirebase(workTicket.row(10)[i].value)] =
-              row[i].value;
+          try {
+            qty = double.parse(row[i].value.toString());
+
+            chargeMap[Item.fromFirebase(workTicket.row(10)[i].value)] = qty;
+          } catch (err) {
+            print('couldn\'t build item ${workTicket.row(10)[i].value}');
+          }
         }
+
+        print('total charges: ${chargeMap.keys.length}');
       }
       i++;
     }

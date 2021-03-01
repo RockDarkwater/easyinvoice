@@ -137,7 +137,7 @@ Future<void> uploadCustomers() async {
       rowIndex = _itemSheet.rows.asMap();
       print('starting at $j');
 
-      for (j; j < currentMax; j++) {
+      for (; j < currentMax; j++) {
         rowMap = rowIndex[j].asMap();
 
         if (rowMap[0] != 'ID') {
