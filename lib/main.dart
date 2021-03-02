@@ -1,3 +1,4 @@
+import 'package:easyinvoice/components/firebase_curation_functions.dart';
 import 'package:excel/excel.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
@@ -76,6 +77,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void _incrementCounter() async {
     await testImport();
+    // await refreshItems();
     setState(() {
       _counter++;
     });
@@ -131,5 +133,6 @@ class _MyHomePageState extends State<MyHomePage> {
         print('upload is not a work ticket');
       }
     }
+    return () => {};
   }
 }

@@ -14,12 +14,11 @@ class Service {
         .doc('$serviceCode')
         .get()
         .then((value) => {
-              this.name = value['name'],
-              this.qbName = value['qbName'],
-              this.category = value['category'],
-              this.workUnits = value['workUnits']
-            })
-        .onError((error, stackTrace) => throw error);
+              this.name = value.data()['name'],
+              this.qbName = value.data()['qbName'],
+              this.category = value.data()['category'],
+              this.workUnits = value.data()['workUnits']
+            });
   }
 
   String translateHeader(String header) {

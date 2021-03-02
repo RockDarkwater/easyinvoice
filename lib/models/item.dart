@@ -4,8 +4,8 @@ class Item {
   final String itemCode;
   String name;
   double price;
-  bool taxable;
   double cost;
+  bool taxable = true;
 
   Item.fromFirebase(this.itemCode) {
     //look on firebase for the item code, pull item details
@@ -14,9 +14,9 @@ class Item {
         .doc(this.itemCode)
         .get()
         .then((value) {
-      this.name = value['name'];
-      this.price = value['price'];
-      this.cost = value['price'];
-    }).onError((error, stackTrace) => throw error);
+      this.name = value.data()['name'];
+      this.price = value.data()['price'];
+      this.cost = value.data()['cost'];
+    });
   }
 }

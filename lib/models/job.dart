@@ -23,9 +23,12 @@ class Job {
 
     int i = 11;
     //create list of station charges
-    while (
-        workTicket.row(i)[0].value != '' || workTicket.row(i)[1].value != '') {
+    while (workTicket.row(i)[0].value != null &&
+        workTicket.row(i)[1].value != null &&
+        workTicket.row(i)[0].value.toString().trim() != '' &&
+        workTicket.row(i)[1].value.toString().trim() != '') {
       // create station charge with each row
+      print('building row $i...');
       stationCharges
           .add(StationCharge.fromWorkTicket(workTicket, workTicket.row(i)));
       i++;
