@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easyinvoice/components/firebase_curation_functions.dart';
 import 'package:excel/excel.dart';
 import 'package:file_picker/file_picker.dart';
@@ -41,6 +42,7 @@ class App extends StatelessWidget {
         }
         // Once complete, show your application
         if (snapshot.connectionState == ConnectionState.done) {
+          // Start Authentication
           return MyApp();
         }
         // Otherwise, show progress indicator whilst waiting for initialization to complete
@@ -52,6 +54,7 @@ class App extends StatelessWidget {
 
 class MyApp extends StatelessWidget {
   @override
+  // If no auth call auth service
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Flutter Demo',
@@ -76,11 +79,15 @@ class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
 
   void _incrementCounter() async {
-    await testImport();
-    // await refreshItems();
-    setState(() {
-      _counter++;
-    });
+    testingConnection();
+    // bool testImportResult = await testImport();
+    // print('testImportResult: ' + testImportResult.toString());
+    // if (await testImport()) {
+    //   // await refreshItems();
+    //   setState(() {
+    //     _counter++;
+    //   });
+    // }
   }
 
   @override
@@ -111,28 +118,46 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  Future<void> testImport() async {
-    FilePickerResult result = await FilePicker.platform.pickFiles();
-
-    if (result == null) {
-      // User canceled the picker
-      print('null pick');
-    } else {
-      // var _filePath = "C:\Anal\HFS Services List.xlsx";
-      var _excel = Excel.decodeBytes(result.files.first.bytes);
-      var _itemSheet = _excel.sheets[_excel.sheets.keys.first];
-      var test = _itemSheet.cell(CellIndex.indexByString('A11')).value;
-      print('object translated - cell A11 is: $test');
-      Job job;
-
-      if (test == 'Station #') {
-        print('building job...');
-        job = Job.fromWorkTicket(_itemSheet);
-        print('${job.customer} - stationCharges: ${job.stationCharges.length}');
-      } else {
-        print('upload is not a work ticket');
-      }
+  testingConnection() async {
+    try {
+      DocumentSnapshot itemValue = await FirebaseFirestore.instance
+          .collection('items')
+          .doc('CABLE')
+          .get();
+      print('itemValue data: ${itemValue.data()['name']}');
+    } catch (err) {
+      print('Error getting test doc: $err');
     }
-    return () => {};
+  }
+
+  Future<bool> testImport() async {
+    try {
+      FilePickerResult result = await FilePicker.platform.pickFiles();
+      if (result == null) {
+        // User canceled the picker
+        print('null pick');
+      } else {
+        // var _filePath = "C:\Anal\HFS Services List.xlsx";
+        var _excel = Excel.decodeBytes(result.files.first.bytes);
+        var _itemSheet = _excel.sheets[_excel.sheets.keys.first];
+        var test = _itemSheet.cell(CellIndex.indexByString('A11')).value;
+        print('object translated - cell A11 is: $test');
+        Job job;
+
+        if (test == 'Station #') {
+          print('building job...');
+          job = Job.fromWorkTicket(_itemSheet);
+          print(
+              '${job.customer} - stationCharges: ${job.stationCharges.length}');
+        } else {
+          print('upload is not a work ticket');
+        }
+        return true;
+      }
+    } catch (err) {
+      print('Error picking file: ' + err);
+      return false;
+    }
+    return false;
   }
 }

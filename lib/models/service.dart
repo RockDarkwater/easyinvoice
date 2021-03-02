@@ -9,16 +9,26 @@ class Service {
 
   Service.fromFirebase(this.code) {
     String serviceCode = translateHeader(this.code);
+
+    print('building service: $serviceCode');
+
     FirebaseFirestore.instance
         .collection('services')
         .doc('$serviceCode')
         .get()
-        .then((value) => {
-              this.name = value.data()['name'],
-              this.qbName = value.data()['qbName'],
-              this.category = value.data()['category'],
-              this.workUnits = value.data()['workUnits']
-            });
+        .then((value) {
+      if (value.exists) {
+        this.name = value.data()['name'];
+        this.qbName = value.data()['qbName'];
+        this.category = value.data()['category'];
+        this.workUnits = value.data()['workUnits'];
+      } else {
+        print('$serviceCode does not exist');
+      }
+    }).onError((error, stackTrace) {
+      print('error with service: $error');
+      print('stacktrace: $stackTrace');
+    });
   }
 
   String translateHeader(String header) {
