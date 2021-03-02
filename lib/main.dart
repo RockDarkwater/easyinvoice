@@ -1,15 +1,14 @@
+// @dart=2.9
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:easyinvoice/components/firebase_curation_functions.dart';
 import 'package:excel/excel.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
-
-// Import the firebase_core plugin
 import 'package:firebase_core/firebase_core.dart';
 
 import 'models/job.dart';
 
 // Todo:
+// - adjust item/service constructors to not include firebase calls
 // - function to create service price collection for customers
 
 // - import for AMIS, Work Ticket, and Accugas data into locally stored sql table.
@@ -80,8 +79,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void _incrementCounter() async {
     testingConnection();
-    // bool testImportResult = await testImport();
-    // print('testImportResult: ' + testImportResult.toString());
+
     // if (await testImport()) {
     //   // await refreshItems();
     //   setState(() {
@@ -119,11 +117,11 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   testingConnection() async {
+    FirebaseFirestore firebase = FirebaseFirestore.instance;
     try {
-      DocumentSnapshot itemValue = await FirebaseFirestore.instance
-          .collection('items')
-          .doc('CABLE')
-          .get();
+      DocumentSnapshot itemValue =
+          await firebase.collection('items').doc('CABLE').get();
+
       print('itemValue data: ${itemValue.data()['name']}');
     } catch (err) {
       print('Error getting test doc: $err');
