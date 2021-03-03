@@ -1,11 +1,29 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class Item {
   final String itemCode;
-  final String name;
-  final double price;
-  final double cost;
+  String name;
+  double price;
+  double cost;
   bool taxable = true;
 
-  Item(this.itemCode, this.name, this.price, this.cost) {
-    print('building item: $itemCode');
+  Item.fromFirebase(this.itemCode) {
+    // create item from firestore collection 'items'
+    FirebaseFirestore.instance
+        .collection('items')
+        .doc(itemCode)
+        .get()
+        .then((value) {
+      if (value.exists) {
+        this.name = value.data()['name'];
+        this.price = value.data()['price'];
+        this.cost = value.data()['cost'];
+      } else {
+        print('$itemCode does not exist');
+      }
+    }).onError((error, stackTrace) {
+      print('Error retrieving item: ' + error.toString());
+      print('Stacktrace: ' + stackTrace.toString());
+    });
   }
 }

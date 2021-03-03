@@ -8,11 +8,12 @@ import 'package:firebase_core/firebase_core.dart';
 import 'models/job.dart';
 
 // Todo:
-// - adjust item/service constructors to not include firebase calls
 // - function to create service price collection for customers
 
-// - import for AMIS, Work Ticket, and Accugas data into locally stored sql table.
+// - import for AMIS and Accugas data into locally stored sql table.
 //    - billable from job, lease info, quantity, and item or service code
+
+// - function to tie job customer to firestore customer data
 
 // - ui to interact with customers, prices, items, and services.
 // - invoice template
@@ -78,14 +79,14 @@ class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
 
   void _incrementCounter() async {
-    testingConnection();
+    // testingConnection();
 
-    // if (await testImport()) {
-    //   // await refreshItems();
-    //   setState(() {
-    //     _counter++;
-    //   });
-    // }
+    if (await testImport()) {
+      // await refreshItems();
+      setState(() {
+        _counter++;
+      });
+    }
   }
 
   @override

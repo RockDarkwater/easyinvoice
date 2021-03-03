@@ -13,6 +13,7 @@ class Job {
   Job(this.customer, this.techName, this.jobDate);
 
   Job.fromWorkTicket(Sheet workTicket) {
+    // pull job specific variables
     customer = workTicket.cell(CellIndex.indexByString("B2")).value.toString();
     techName = workTicket.cell(CellIndex.indexByString("B4")).value.toString();
     jobDate = workTicket.cell(CellIndex.indexByString("B3")).value;
@@ -22,13 +23,13 @@ class Job {
     location = workTicket.cell(CellIndex.indexByString("K4")).value.toString();
 
     int i = 11;
-    //create list of station charges
+    // create list of station charges
+    // TODO: test on work ticket with partial station number/name lines.
     while (workTicket.row(i)[0].value != null &&
         workTicket.row(i)[1].value != null &&
         workTicket.row(i)[0].value.toString().trim() != '' &&
         workTicket.row(i)[1].value.toString().trim() != '') {
       // create station charge with each row
-      print('building row $i...');
       stationCharges
           .add(StationCharge.fromWorkTicket(workTicket, workTicket.row(i)));
       i++;
