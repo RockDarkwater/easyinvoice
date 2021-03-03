@@ -24,10 +24,7 @@ class Job {
 
     int i = 11;
     // create list of station charges
-    // TODO: test on work ticket with partial station number/name lines.
-    while (workTicket.row(i)[0].value != null &&
-        workTicket.row(i)[1].value != null &&
-        workTicket.row(i)[0].value.toString().trim() != '' &&
+    while (workTicket.row(i)[1].value != null &&
         workTicket.row(i)[1].value.toString().trim() != '') {
       // create station charge with each row
       stationCharges
@@ -36,7 +33,40 @@ class Job {
     }
   }
 
-  // Job.fromAmis(List<dynamic> row);
+  Job.fromAccugas(Sheet workTicket, String customerNumber) {
+    int i = 1;
+    String testVal = workTicket
+        .cell(CellIndex.indexByColumnRow(columnIndex: 2, rowIndex: i))
+        .value
+        .toString();
 
-  // Job.fromAccugas(List<dynamic> row);
+    while (testVal != 'null' || testVal != '') {
+      // on first row, populate job variables
+      if (workTicket.rows[i].asMap()[2].toString() == customerNumber) {
+        // TODO: customer, requisitioner, po number, location set by customer object
+        techName ??
+            workTicket
+                .cell(CellIndex.indexByString("BA" + i.toString()))
+                .value
+                .toString();
+        jobDate ??
+            workTicket.cell(CellIndex.indexByString("I" + i.toString())).value;
+        stationCharges.add(StationCharge.fromAccuGas(workTicket.rows[i]));
+      }
+
+      // add each row where column C matches customer number as station charge
+      i++;
+      //check for end of file
+      testVal = workTicket
+          .cell(CellIndex.indexByColumnRow(columnIndex: 2, rowIndex: i))
+          .value
+          .toString();
+    }
+  }
+
+  // Job.fromAmis(Sheet workTicket){
+  // pull job specific variables
+  // create list of station charges
+  // create station charge with each row
+  // }
 }

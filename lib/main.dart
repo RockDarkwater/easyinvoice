@@ -1,19 +1,17 @@
 // @dart=2.9
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:excel/excel.dart';
+import 'package:easyinvoice/models/import_batch.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 
-import 'models/job.dart';
-
 // Todo:
 // - function to create service price collection for customers
 
-// - import for AMIS and Accugas data into locally stored sql table.
+// - import for AMIS and Accugas data into import batch object.
 //    - billable from job, lease info, quantity, and item or service code
 
-// - function to tie job customer to firestore customer data
+// - customer model from firestore
 
 // - ui to interact with customers, prices, items, and services.
 // - invoice template
@@ -131,30 +129,18 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Future<bool> testImport() async {
     try {
-      FilePickerResult result = await FilePicker.platform.pickFiles();
+      FilePickerResult result =
+          await FilePicker.platform.pickFiles(allowMultiple: true);
       if (result == null) {
         // User canceled the picker
         print('null pick');
       } else {
-        // var _filePath = "C:\Anal\HFS Services List.xlsx";
-        var _excel = Excel.decodeBytes(result.files.first.bytes);
-        var _itemSheet = _excel.sheets[_excel.sheets.keys.first];
-        var test = _itemSheet.cell(CellIndex.indexByString('A11')).value;
-        print('object translated - cell A11 is: $test');
-        Job job;
-
-        if (test == 'Station #') {
-          print('building job...');
-          job = Job.fromWorkTicket(_itemSheet);
-          print(
-              '${job.customer} - stationCharges: ${job.stationCharges.length}');
-        } else {
-          print('upload is not a work ticket');
-        }
-        return true;
+        print('picked ${result.files.length} files');
+        ImportBatch batch = ImportBatch(result);
+        print('Import batch created with ${batch.jobs.length} jobs');
       }
     } catch (err) {
-      print('Error picking file: ' + err);
+      print('Error picking files: ' + err);
       return false;
     }
     return false;
