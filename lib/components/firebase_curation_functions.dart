@@ -205,3 +205,54 @@ Future<void> uploadCustomers() async {
     }
   }
 }
+
+Future<void> uploadServicePrices() async {
+  FilePickerResult result = await FilePicker.platform.pickFiles();
+
+  if (result != null) {
+    //load upload sheet into memory
+    var _excel = Excel.decodeBytes(result.files.first.bytes);
+    var _itemSheet = _excel.sheets['Upload'];
+
+    if (_itemSheet.cell(CellIndex.indexByString("A1")).value.toString() ==
+        'custID') {
+      FirebaseFirestore fireBase = FirebaseFirestore.instance;
+      DocumentSnapshot doc;
+      Map rowMap;
+      String custString;
+      Map<String, dynamic> dataString = Map();
+      WriteBatch batch;
+
+      try {
+        await batchDelete('servicePrices');
+        print('services deleted');
+      } catch (err) {
+        print('couldn\'t delete servicePrices');
+      }
+      batch = fireBase.batch();
+
+      // create a customer pricing document for each row
+      for (int i = 1; i < _itemSheet.maxRows; i++) {
+        rowMap = _itemSheet.rows[i].asMap();
+        custString = rowMap[1].toString();
+
+        for (int j = 2; j < _itemSheet.maxCols; j++) {
+          if (rowMap[j].toString() != '0')
+            dataString[_itemSheet.rows[0][j].toString().toLowerCase()] =
+                rowMap[j];
+        }
+        print('$custString - ${dataString.toString()}');
+        batch.set(fireBase.collection('servicePrices').doc('$custString'),
+            dataString);
+      }
+
+      try {
+        await batch.commit();
+      } catch (err) {
+        print('could not commit: $err');
+      }
+    } else {
+      print('not a price-mapping format');
+    }
+  }
+}

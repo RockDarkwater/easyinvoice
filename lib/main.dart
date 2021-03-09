@@ -4,10 +4,9 @@ import 'package:easyinvoice/models/import_batch.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:easyinvoice/components/firebase_curation_functions.dart';
 
 // Todo:
-// - function to create service price collection for customers
-
 // - import for AMIS and Accugas data into import batch object.
 //    - billable from job, lease info, quantity, and item or service code
 
@@ -77,14 +76,16 @@ class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
 
   void _incrementCounter() async {
-    // testingConnection();
+    await uploadServicePrices();
 
-    if (await testImport()) {
-      // await refreshItems();
-      setState(() {
-        _counter++;
-      });
-    }
+    // if (await testImport()) {
+    //   // await refreshItems();
+    //   setState(() {
+    //     _counter++;
+    //   });
+    // }
+
+    print('done!');
   }
 
   @override
