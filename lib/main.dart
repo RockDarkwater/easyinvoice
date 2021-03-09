@@ -4,7 +4,10 @@ import 'package:easyinvoice/models/import_batch.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:easyinvoice/components/firebase_curation_functions.dart';
+
+import 'models/customer.dart';
+import 'models/item.dart';
+import 'models/service.dart';
 
 // Todo:
 // - import for AMIS and Accugas data into import batch object.
@@ -75,11 +78,19 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
 
-  void _incrementCounter() async {
-    await uploadServicePrices();
+  Future<void> _incrementCounter() async {
+    // await uploadServicePrices();
+    // await refreshItems();
+
+    DocumentSnapshot doc = await FirebaseFirestore.instance
+        .collection('customers')
+        .doc('8093')
+        .get();
+
+    Customer cust = Customer.fromFirebase(doc);
+    print('${cust.custNum} - ${cust.billingName}');
 
     // if (await testImport()) {
-    //   // await refreshItems();
     //   setState(() {
     //     _counter++;
     //   });
@@ -139,6 +150,11 @@ class _MyHomePageState extends State<MyHomePage> {
         print('picked ${result.files.length} files');
         ImportBatch batch = ImportBatch(result);
         print('Import batch created with ${batch.jobs.length} jobs');
+        print('Job #1 tech: ${batch.jobs.first.techName}');
+        Service key =
+            batch.jobs.first.stationCharges.first.chargeMap.keys.first;
+        print(
+            'Job contains a charge for ${batch.jobs.first.stationCharges.first.chargeMap[key]} of item: ${key.name}');
       }
     } catch (err) {
       print('Error picking files: ' + err);
