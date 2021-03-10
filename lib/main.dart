@@ -85,7 +85,7 @@ class _MyHomePageState extends State<MyHomePage> {
     // await uploadCustomers();
 
     Customer testCust = await flutterfire.getCustomer('8113');
-    print('${testCust.billingName} - ${testCust.priceMap['calibrations']}');
+    print('${testCust.billingName} - ${testCust.priceMap['calibration']}');
 
     // if (await testImport()) {
     //   setState(() {

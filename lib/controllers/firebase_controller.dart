@@ -45,20 +45,23 @@ class FireBaseController extends GetxController {
     doc = await firebase.collection('customers').doc('$custNum').get();
     print('doc 1: ${doc.exists}');
     doc2 = await firebase.collection('servicePrices').doc('$custNum').get();
-    print('doc 2: ${doc2.exists}');
+    print('doc 2: ${doc.data()['secondarySubmit']}');
 
     primarySubmit = SubmitOption.values.firstWhere((element) =>
-        element.toString() == doc.data()['primarySubmit'].toString());
+        element.toString().split('.')[1] ==
+        doc.data()['primarySubmit'].toString());
     billingName = doc.data()['billingName'];
     priceMap = doc2.data();
     add1 = doc.data()['add1'];
     add2 = doc.data()['add2'];
     add3 = doc.data()['add3'];
     secondarySubmit = SubmitOption.values.firstWhere(
-        (element) => element.toString() == doc.data()['secondarySubmit']);
+        (element) =>
+            element.toString().split('.')[1] == doc.data()['secondarySubmit'],
+        orElse: () => SubmitOption.none);
     city = doc.data()['city'];
     state = doc.data()['state'];
-    zip = doc.data()['zip'];
+    zip = doc.data()['zip'].toString();
     custClass = doc.data()['custClass'];
     distList = doc.data()['distList'];
     fieldArea = doc.data()['fieldArea'];
