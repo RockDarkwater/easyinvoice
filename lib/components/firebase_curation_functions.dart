@@ -42,10 +42,16 @@ Future<void> batchDelete(String collectionName) {
   FirebaseFirestore firestore = FirebaseFirestore.instance;
   CollectionReference collection = firestore.collection(collectionName);
   WriteBatch batch = firestore.batch();
-
+  int i = 0;
   return collection.get().then((querySnapshot) {
     querySnapshot.docs.forEach((doc) {
       batch.delete(doc.reference);
+      i++;
+      if (i >= 499) {
+        batch.commit();
+        batch = firestore.batch();
+        i = 0;
+      }
     });
 
     return batch.commit();
@@ -151,6 +157,9 @@ Future<void> uploadCustomers() async {
       WriteBatch batch;
       Map<int, List<dynamic>> rowIndex;
       Map<int, dynamic> rowMap;
+      String primarySubmit;
+      String secondarySubmit;
+      String billingDeets;
 
       for (int i = 0; i <= loops; i++) {
         (i * 500 > _itemSheet.maxRows)
@@ -162,6 +171,27 @@ Future<void> uploadCustomers() async {
 
         for (; j < currentMax; j++) {
           rowMap = rowIndex[j].asMap();
+          billingDeets = rowMap[18].toString().toLowerCase();
+
+          if (billingDeets.contains('mail')) {
+            rowMap[19].toString().length > 0
+                ? primarySubmit = 'email'
+                : primarySubmit = 'mail';
+            billingDeets.contains('adp')
+                ? secondarySubmit = 'openinvoice'
+                : secondarySubmit ?? 'none';
+            billingDeets.contains('ariba')
+                ? secondarySubmit = 'ariba'
+                : secondarySubmit ?? 'none';
+          } else {
+            billingDeets.contains('adp')
+                ? primarySubmit = 'openinvoice'
+                : primarySubmit ?? 'none';
+            billingDeets.contains('ariba')
+                ? primarySubmit = 'ariba'
+                : primarySubmit ?? 'none';
+            secondarySubmit ?? 'none';
+          }
 
           if (rowMap[0] != 'ID') {
             batch.set(
@@ -183,7 +213,8 @@ Future<void> uploadCustomers() async {
                   'fieldArea': rowMap[15] ?? '',
                   'taxRate': rowMap[16] ?? 8.25,
                   'custClass': rowMap[17] ?? '',
-                  'billingDeets': rowMap[18] ?? '',
+                  'primarySubmit': primarySubmit,
+                  'secondarySubmit': secondarySubmit,
                   'distList': rowMap[19] ?? '',
                   'fieldMethod': rowMap[20] ?? 'byLease',
                   'noChargeArray': rowMap[21] ?? '',

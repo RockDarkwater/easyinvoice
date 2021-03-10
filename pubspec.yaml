@@ -28,6 +28,7 @@ dependencies:
   excel: ^1.1.5
   file_picker: ^3.0.0
   cupertino_icons: ^1.0.2
+  get: ^3.26.0
 
 dev_dependencies:
   flutter_test:

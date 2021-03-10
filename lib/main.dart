@@ -1,13 +1,12 @@
 // @dart=2.9
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:easyinvoice/models/import_batch.dart';
-import 'package:file_picker/file_picker.dart';
+import 'package:easyinvoice/controllers/firebase_controller.dart';
+import 'package:easyinvoice/models/customer.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
-
-import 'models/customer.dart';
+import 'package:get/get.dart';
+import 'components/firebase_curation_functions.dart';
 import 'models/item.dart';
-import 'models/service.dart';
 
 // Todo:
 // - import for AMIS and Accugas data into import batch object.
@@ -23,6 +22,7 @@ import 'models/service.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
+  final flutterfire = Get.put(FireBaseController());
   runApp(App());
 }
 
@@ -79,16 +79,13 @@ class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
 
   Future<void> _incrementCounter() async {
+    FireBaseController flutterfire = Get.find();
     // await uploadServicePrices();
     // await refreshItems();
+    // await uploadCustomers();
 
-    DocumentSnapshot doc = await FirebaseFirestore.instance
-        .collection('customers')
-        .doc('8093')
-        .get();
-
-    Customer cust = Customer.fromFirebase(doc);
-    print('${cust.custNum} - ${cust.billingName}');
+    Customer testCust = await flutterfire.getCustomer('8113');
+    print('${testCust.billingName} - ${testCust.priceMap['calibrations']}');
 
     // if (await testImport()) {
     //   setState(() {
@@ -137,29 +134,5 @@ class _MyHomePageState extends State<MyHomePage> {
     } catch (err) {
       print('Error getting test doc: $err');
     }
-  }
-
-  Future<bool> testImport() async {
-    try {
-      FilePickerResult result =
-          await FilePicker.platform.pickFiles(allowMultiple: true);
-      if (result == null) {
-        // User canceled the picker
-        print('null pick');
-      } else {
-        print('picked ${result.files.length} files');
-        ImportBatch batch = ImportBatch(result);
-        print('Import batch created with ${batch.jobs.length} jobs');
-        print('Job #1 tech: ${batch.jobs.first.techName}');
-        Service key =
-            batch.jobs.first.stationCharges.first.chargeMap.keys.first;
-        print(
-            'Job contains a charge for ${batch.jobs.first.stationCharges.first.chargeMap[key]} of item: ${key.name}');
-      }
-    } catch (err) {
-      print('Error picking files: ' + err);
-      return false;
-    }
-    return false;
   }
 }
