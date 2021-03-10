@@ -7,6 +7,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:get/get.dart';
 import 'components/firebase_curation_functions.dart';
 import 'models/item.dart';
+import 'models/service.dart';
 
 // Todo:
 // - import for AMIS and Accugas data into import batch object.
@@ -84,8 +85,8 @@ class _MyHomePageState extends State<MyHomePage> {
     // await refreshItems();
     // await uploadCustomers();
 
-    Customer testCust = await flutterfire.getCustomer('8113');
-    print('${testCust.billingName} - ${testCust.priceMap['calibration']}');
+    Service testServ = await flutterfire.getService('miles');
+    print('${testServ.name} - ${testServ.qbName}');
 
     // if (await testImport()) {
     //   setState(() {

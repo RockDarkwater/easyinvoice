@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easyinvoice/models/customer.dart';
 import 'package:easyinvoice/models/item.dart';
+import 'package:easyinvoice/models/service.dart';
 import 'package:get/get.dart';
 
 class FireBaseController extends GetxController {
@@ -43,9 +44,7 @@ class FireBaseController extends GetxController {
     bool ccFee;
 
     doc = await firebase.collection('customers').doc('$custNum').get();
-    print('doc 1: ${doc.exists}');
     doc2 = await firebase.collection('servicePrices').doc('$custNum').get();
-    print('doc 2: ${doc.data()['secondarySubmit']}');
 
     primarySubmit = SubmitOption.values.firstWhere((element) =>
         element.toString().split('.')[1] ==
@@ -89,6 +88,21 @@ class FireBaseController extends GetxController {
         requisitioner: requisitioner,
         taxRate: taxRate,
         ccFee: ccFee);
+  }
+
+  Future<Service> getService(String serviceCode) async {
+    String code = translateServiceHeader(serviceCode);
+
+    DocumentSnapshot doc =
+        await firebase.collection('services').doc('$code').get();
+
+    String name = doc.data()['name'];
+    String qbName = doc.data()['qbName'];
+    String category = doc.data()['category'];
+    double workUnits = doc.data()['workUnits'];
+
+    return Service(
+        name: name, qbName: qbName, category: category, workUnits: workUnits);
   }
 
   String translateServiceHeader(String header) {

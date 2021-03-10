@@ -5,6 +5,10 @@ class Service {
   final String category;
   final double workUnits;
 
-  Service(this.serviceCode, this.name,
-      [this.qbName, this.category, this.workUnits]);
+  Service(
+      {this.serviceCode,
+      this.name,
+      this.qbName,
+      this.category,
+      this.workUnits});
 }

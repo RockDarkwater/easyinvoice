@@ -7,5 +7,5 @@ class Job {
   String requisitioner;
   String location;
   var jobDate;
-  List<StationCharge> stationCharges = [];
+  List<StationCharge> stationCharges;
 }
