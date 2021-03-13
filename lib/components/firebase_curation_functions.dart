@@ -248,7 +248,6 @@ Future<void> uploadServicePrices() async {
     if (_itemSheet.cell(CellIndex.indexByString("A1")).value.toString() ==
         'custID') {
       FirebaseFirestore fireBase = FirebaseFirestore.instance;
-      DocumentSnapshot doc;
       Map rowMap;
       String custString;
       Map<String, dynamic> dataString = Map();

@@ -7,5 +7,14 @@ class Job {
   String requisitioner;
   String location;
   var jobDate;
-  List<StationCharge> stationCharges;
+  List<StationCharge> stationCharges = [];
+
+  Job(
+      {this.customer,
+      this.techName,
+      this.poNumber,
+      this.requisitioner,
+      this.location,
+      this.jobDate,
+      this.stationCharges});
 }

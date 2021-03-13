@@ -1,7 +1,8 @@
 import 'package:excel/excel.dart';
 
 class ImportBatch {
-  List<Excel> spreadsheets;
+  List<Sheet> spreadsheets;
+  Map<String, List<List<String>>> txtDocs = Map();
 
-  ImportBatch(this.spreadsheets);
+  ImportBatch({this.spreadsheets, this.txtDocs});
 }

@@ -1,19 +1,15 @@
-// @dart=2.9
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easyinvoice/controllers/firebase_controller.dart';
-import 'package:easyinvoice/models/customer.dart';
+import 'package:easyinvoice/controllers/import_controller.dart';
+import 'package:easyinvoice/models/import_batch.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:get/get.dart';
-import 'components/firebase_curation_functions.dart';
-import 'models/item.dart';
-import 'models/service.dart';
+
+import 'models/job.dart';
 
 // Todo:
-// - import for AMIS and Accugas data into import batch object.
-//    - billable from job, lease info, quantity, and item or service code
 
-// - customer model from firestore
+// - Move spreadsheet data into job/station/item structure
 
 // - ui to interact with customers, prices, items, and services.
 // - invoice template
@@ -23,7 +19,8 @@ import 'models/service.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  final flutterfire = Get.put(FireBaseController());
+  Get.put(FireBaseController());
+  Get.put(ImportController());
   runApp(App());
 }
 
@@ -44,25 +41,17 @@ class App extends StatelessWidget {
         // Once complete, show your application
         if (snapshot.connectionState == ConnectionState.done) {
           // Start Authentication
-          return MyApp();
+          return MaterialApp(
+            title: 'Flutter Demo',
+            theme: ThemeData(
+              primarySwatch: Colors.blue,
+            ),
+            home: MyHomePage(title: 'Flutter Demo Home Page'),
+          );
         }
         // Otherwise, show progress indicator whilst waiting for initialization to complete
         return CircularProgressIndicator();
       },
-    );
-  }
-}
-
-class MyApp extends StatelessWidget {
-  @override
-  // If no auth call auth service
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: MyHomePage(title: 'Flutter Demo Home Page'),
     );
   }
 }
@@ -80,14 +69,17 @@ class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
 
   Future<void> _incrementCounter() async {
-    FireBaseController flutterfire = Get.find();
+    // FireBaseController flutterfire = Get.find();
+    ImportController importController = Get.find();
     // await uploadServicePrices();
     // await refreshItems();
     // await uploadCustomers();
 
-    Service testServ = await flutterfire.getService('miles');
-    print('${testServ.name} - ${testServ.qbName}');
+    ImportBatch batch = await importController.import();
 
+    Job job =
+        await importController.buildWorkTicketJob(batch.spreadsheets.first);
+    print('${job.customer} - ${job.requisitioner}');
     // if (await testImport()) {
     //   setState(() {
     //     _counter++;
@@ -123,17 +115,5 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Icon(Icons.add),
       ),
     );
-  }
-
-  testingConnection() async {
-    FirebaseFirestore firebase = FirebaseFirestore.instance;
-    try {
-      DocumentSnapshot itemValue =
-          await firebase.collection('items').doc('CABLE').get();
-
-      print('itemValue data: ${itemValue.data()['name']}');
-    } catch (err) {
-      print('Error getting test doc: $err');
-    }
   }
 }
