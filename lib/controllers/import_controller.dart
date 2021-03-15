@@ -49,12 +49,13 @@ class ImportController extends GetxController {
 
   Future<Job> buildWorkTicketJob(Sheet data) async {
     //set normal
-    String customer = data.cell(CellIndex.indexByString('B2')).toString();
-    String techName = data.cell(CellIndex.indexByString('B4')).toString();
-    String poNumber = data.cell(CellIndex.indexByString('K3')).toString();
-    String requisitioner = data.cell(CellIndex.indexByString('K2')).toString();
-    String location = data.cell(CellIndex.indexByString('K4')).toString();
-    var jobDate = data.cell(CellIndex.indexByString('B3'));
+    String customer = data.cell(CellIndex.indexByString('B2')).value.toString();
+    String techName = data.cell(CellIndex.indexByString('B4')).value.toString();
+    String poNumber = data.cell(CellIndex.indexByString('K3')).value.toString();
+    String requisitioner =
+        data.cell(CellIndex.indexByString('K2')).value.toString();
+    String location = data.cell(CellIndex.indexByString('K4')).value.toString();
+    var jobDate = data.cell(CellIndex.indexByString('B3')).value;
 
     List<StationCharge> stationCharges = [];
     List<dynamic> header = data.rows[10];
@@ -63,22 +64,30 @@ class ImportController extends GetxController {
 
     int i = 11;
     int j = 3;
-    while (data.rows[i][1].toString() != "Instance of Formula") {
+    while (data.rows[i][1].toString() != "Instance of Formula" &&
+        data.rows[i][1] != null &&
+        data.rows[i][1].toString().trim() != '') {
+      // print('lease:${data.rows[i][1].toString()}.');
       activeRow = data.rows[i];
-      while (header[j].toString() != 'null') {
-        print('header: ${header[j].toString()} = ${data.rows[i].toString()}');
+      while (header[j] != null) {
+        // print('header: ${header[j].toString()}');
         if (activeRow[j].toString() != '0' &&
             activeRow[j].toString() != '' &&
-            !activeRow[j].toString().contains('Instance of')) {
-          chargeMap[header[j]] = activeRow[j];
+            !activeRow[j].toString().contains('Instance of') &&
+            activeRow[j] != null) {
+          chargeMap['${header[j].toString()}'] =
+              double.parse(activeRow[j].toString());
+          print(
+              'chargeMap[${header[j].toString()}] = ${double.parse(activeRow[j].toString())}');
         }
         j++;
       }
+      print('creating charge...');
       stationCharges.add(StationCharge(
         leaseNumber: activeRow[0].toString(),
         leaseName: activeRow[1].toString(),
         notes: activeRow[2].toString(),
-        chargeMap: chargeMap,
+        chargeMap: Map.of(chargeMap),
       ));
       i++;
       j = 3;

@@ -80,6 +80,8 @@ class _MyHomePageState extends State<MyHomePage> {
     Job job =
         await importController.buildWorkTicketJob(batch.spreadsheets.first);
     print('${job.customer} - ${job.requisitioner}');
+    print(
+        '${job.stationCharges.last.leaseName} - charges: ${job.stationCharges.first.chargeMap.toString()}');
     // if (await testImport()) {
     //   setState(() {
     //     _counter++;
