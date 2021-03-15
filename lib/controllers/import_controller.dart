@@ -21,6 +21,7 @@ class ImportController extends GetxController {
     Excel book;
     String testVal;
 
+    //For each picked file, either add csv to txtDocs, or add excel to sheets
     result.files.forEach((element) async {
       if (element.name.contains('.csv') || element.name.contains('.txt')) {
         //import text files
@@ -32,16 +33,20 @@ class ImportController extends GetxController {
         //import excel files
         print('not csv');
         book = Excel.decodeBytes(element.bytes);
+
+        // Flag as Amis
         if (book.sheets.keys.contains('Billing_Export'))
           testVal = 'Billing_Export';
+
+        // Flag as Work Ticket
         if (book.sheets.keys.contains('Work Ticket')) testVal = 'Work Ticket';
+
+        // Flag as other
         testVal ?? book.sheets.keys.first.toString();
         sheets.add(book.sheets['$testVal']);
       } else {
         print('${element.name} is not text or excel');
       }
-
-      // sheets.add(book.sheets[testVal]);
     });
 
     return ImportBatch(spreadsheets: sheets, txtDocs: txtDocs);
@@ -49,7 +54,85 @@ class ImportController extends GetxController {
 
   Future<List<Job>> buildAmisJobs(List<List<String>> data) {}
 
-  Future<List<Job>> buildAccugasJobs(Sheet data) {}
+  Future<List<Job>> buildAccugasJobs(Sheet data) async {
+    //core variables
+    FireBaseController flutterfire = Get.find();
+    List<Job> jobs = [];
+
+    //construction variables
+    Job job;
+    StationCharge stationCharge;
+    Map<Service, double> serviceMap = Map();
+    Service service;
+    int quantity;
+
+    //job variables
+    String customer;
+    String techName;
+    String location;
+    var jobDate;
+
+    //station charge variables
+    String leaseName;
+    String leaseNumber;
+    String notes;
+
+    //for each row after header, add service charge to job-> station charge -> item map
+    for (int i = 2; i < data.maxRows; i++) {
+      //get raw data
+      customer = data.cell(CellIndex.indexByString("C$i")).value.toString();
+      techName = data.cell(CellIndex.indexByString("BA$i")).value.toString();
+      location = data.cell(CellIndex.indexByString("AX$i")).value.toString();
+      jobDate = data.cell(CellIndex.indexByString("I$i")).value;
+      leaseName = data.cell(CellIndex.indexByString("F$i")).value.toString();
+      leaseNumber = data.cell(CellIndex.indexByString("D$i")).value.toString();
+      notes = data.cell(CellIndex.indexByString("M$i")).value.toString();
+      service = await getGasService(notes);
+
+      //check if job exists for same customer, if not make it.
+      job = jobs.firstWhere((job) => job.customer == customer, orElse: () {
+        // print('job for $customer does not exist');
+        Job newJob = Job(
+            customer: customer,
+            techName: techName,
+            location: location,
+            jobDate: jobDate,
+            stationCharges: [
+              StationCharge(
+                leaseName: leaseName,
+                leaseNumber: leaseNumber,
+                notes: notes,
+                serviceMap: {service: 1},
+                itemMap: {},
+              ),
+            ]);
+        jobs.add(newJob);
+        return newJob;
+      });
+
+      //check if station charge exists for job, if not, make it and then add it.
+      stationCharge = job.stationCharges
+          .firstWhere((charge) => charge.leaseName == leaseName, orElse: () {
+        StationCharge newCharge = StationCharge(
+          leaseName: leaseName,
+          leaseNumber: leaseNumber,
+          notes: notes,
+          serviceMap: {service: 1},
+          itemMap: {},
+        );
+        job.stationCharges.add(newCharge);
+        return newCharge;
+      });
+
+      //check if station charge includes service, if not, make it.
+      if (serviceMap.containsKey(service)) {
+        serviceMap[service]++;
+      } else {
+        serviceMap[service] = 1;
+      }
+    }
+    return jobs;
+  }
 
   Future<Job> buildWorkTicketJob(Sheet data) async {
     //set normal
@@ -192,7 +275,8 @@ class ImportController extends GetxController {
     return serviceCode;
   }
 
-  String getGasService(String value) {
+  Future<Service> getGasService(String value) async {
+    FireBaseController fireBaseController = Get.find();
     String serviceName;
     bool ext = false;
     bool liq = false;
@@ -213,7 +297,7 @@ class ImportController extends GetxController {
       if (ext && !liq) serviceName = 'extGasSample';
       if (!ext && !liq) serviceName = 'c6GasSample';
     }
-    print('$value = $serviceName');
-    return serviceName;
+    // print('$value = $serviceName');
+    return await fireBaseController.getService(serviceName);
   }
 }

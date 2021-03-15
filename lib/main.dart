@@ -9,13 +9,16 @@ import 'models/job.dart';
 
 // Todo:
 
-// - Move spreadsheet data into job/station/((item)) structure
+// - Move AMIS/AccuGas spreadsheet data into job/station/item structure
+// - Function to find customer number from name string
 
 // - ui to interact with customers, prices, items, and services.
 // - invoice template
 
 // - link to local email program, or method to send from "invoicing@howardmeasurement.com"
 // - ADP and QB export files.
+
+// - enable desktop mode?
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -77,11 +80,13 @@ class _MyHomePageState extends State<MyHomePage> {
 
     ImportBatch batch = await importController.import();
 
-    Job job =
-        await importController.buildWorkTicketJob(batch.spreadsheets.first);
-    print('${job.customer} - ${job.requisitioner}');
-    print(
-        '${job.stationCharges.last.leaseName} - items: ${job.stationCharges.first.itemMap.toString()} - services: ${job.stationCharges.first.serviceMap.toString()}');
+    List<Job> jobs =
+        await importController.buildAccugasJobs(batch.spreadsheets.first);
+    double count = jobs.first.countCharges();
+    print('${jobs.length} jobs. First: ${jobs.first.customer} - $count');
+
+    // print(
+    //     '${jobs.length} jobs. First: ${jobs.first.customer} - ${jobs.first.stationCharges.length} stations, ${jobs.first.countCharges()}');
     // if (await testImport()) {
     //   setState(() {
     //     _counter++;
