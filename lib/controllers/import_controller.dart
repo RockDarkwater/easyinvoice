@@ -1,7 +1,11 @@
 import 'dart:convert';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:easyinvoice/controllers/firebase_controller.dart';
 import 'package:easyinvoice/models/import_batch.dart';
+import 'package:easyinvoice/models/item.dart';
 import 'package:easyinvoice/models/job.dart';
+import 'package:easyinvoice/models/service.dart';
 import 'package:easyinvoice/models/station_charge.dart';
 import 'package:excel/excel.dart';
 import 'package:file_picker/file_picker.dart';
@@ -49,6 +53,7 @@ class ImportController extends GetxController {
 
   Future<Job> buildWorkTicketJob(Sheet data) async {
     //set normal
+    FireBaseController flutterfire = Get.find();
     String customer = data.cell(CellIndex.indexByString('B2')).value.toString();
     String techName = data.cell(CellIndex.indexByString('B4')).value.toString();
     String poNumber = data.cell(CellIndex.indexByString('K3')).value.toString();
@@ -60,7 +65,13 @@ class ImportController extends GetxController {
     List<StationCharge> stationCharges = [];
     List<dynamic> header = data.rows[10];
     List<dynamic> activeRow;
-    Map<dynamic, double> chargeMap = Map();
+    Map<Service, double> serviceMap = Map();
+    Map<Item, double> itemMap = Map();
+    String code;
+    bool isItem;
+    bool isService;
+    Item item;
+    Service service;
 
     int i = 11;
     int j = 3;
@@ -75,8 +86,21 @@ class ImportController extends GetxController {
             activeRow[j].toString() != '' &&
             !activeRow[j].toString().contains('Instance of') &&
             activeRow[j] != null) {
-          chargeMap['${header[j].toString()}'] =
-              double.parse(activeRow[j].toString());
+          code = header[j].toString();
+          isItem = await checkExist('items', code);
+          isService =
+              await checkExist('services', translateServiceHeader(code));
+          if (isItem) {
+            //get Item
+            item = await flutterfire.getItem(code);
+            itemMap[item] = double.parse(activeRow[j].toString());
+          } else if (isService) {
+            // get Service
+            service =
+                await flutterfire.getService(translateServiceHeader(code));
+            serviceMap[service] = double.parse(activeRow[j].toString());
+          }
+
           print(
               'chargeMap[${header[j].toString()}] = ${double.parse(activeRow[j].toString())}');
         }
@@ -87,11 +111,13 @@ class ImportController extends GetxController {
         leaseNumber: activeRow[0].toString(),
         leaseName: activeRow[1].toString(),
         notes: activeRow[2].toString(),
-        chargeMap: Map.of(chargeMap),
+        itemMap: Map.of(itemMap),
+        serviceMap: Map.of(serviceMap),
       ));
       i++;
       j = 3;
-      chargeMap.clear();
+      itemMap.clear();
+      serviceMap.clear();
     }
     return Job(
       customer: customer,
@@ -111,6 +137,59 @@ class ImportController extends GetxController {
     //     notes: activeRow[2],
     //   ));
     // }
+  }
+
+  static Future<bool> checkExist(String collection, String docID) async {
+    bool exists = false;
+    FireBaseController fireBaseController = Get.find();
+    try {
+      await fireBaseController.firebase
+          .collection('$collection')
+          .doc('$docID')
+          .get()
+          .then((doc) {
+        if (doc.exists) {
+          exists = true;
+          print('$collection $docID exists');
+        } else {
+          print('$collection $docID doesn\'t exist');
+          exists = false;
+        }
+      });
+      return exists;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  String translateServiceHeader(String header) {
+    // map work ticket column header to firestore service name
+    String serviceCode;
+
+    switch (header.trim().toLowerCase()) {
+      case 'sample':
+        serviceCode = 'c6GasSample';
+        break;
+      case 'stain tube':
+        serviceCode = 'stainTube';
+        break;
+      case 'efm collect':
+        serviceCode = 'efmCollection';
+        break;
+      case 'travel':
+        serviceCode = 'travelTime';
+        break;
+      case 'tech time':
+        serviceCode = 'techTime';
+        break;
+      case 'miles':
+        serviceCode = 'mileage';
+        break;
+      default:
+        serviceCode = header.toLowerCase();
+    }
+
+    return serviceCode;
   }
 
   String getGasService(String value) {

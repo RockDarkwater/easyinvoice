@@ -9,7 +9,7 @@ import 'models/job.dart';
 
 // Todo:
 
-// - Move spreadsheet data into job/station/item structure
+// - Move spreadsheet data into job/station/((item)) structure
 
 // - ui to interact with customers, prices, items, and services.
 // - invoice template
@@ -81,7 +81,7 @@ class _MyHomePageState extends State<MyHomePage> {
         await importController.buildWorkTicketJob(batch.spreadsheets.first);
     print('${job.customer} - ${job.requisitioner}');
     print(
-        '${job.stationCharges.last.leaseName} - charges: ${job.stationCharges.first.chargeMap.toString()}');
+        '${job.stationCharges.last.leaseName} - items: ${job.stationCharges.first.itemMap.toString()} - services: ${job.stationCharges.first.serviceMap.toString()}');
     // if (await testImport()) {
     //   setState(() {
     //     _counter++;

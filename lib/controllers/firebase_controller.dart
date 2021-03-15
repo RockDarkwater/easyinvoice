@@ -91,10 +91,8 @@ class FireBaseController extends GetxController {
   }
 
   Future<Service> getService(String serviceCode) async {
-    String code = translateServiceHeader(serviceCode);
-
     DocumentSnapshot doc =
-        await firebase.collection('services').doc('$code').get();
+        await firebase.collection('services').doc('$serviceCode').get();
 
     String name = doc.data()['name'];
     String qbName = doc.data()['qbName'];
@@ -103,35 +101,5 @@ class FireBaseController extends GetxController {
 
     return Service(
         name: name, qbName: qbName, category: category, workUnits: workUnits);
-  }
-
-  String translateServiceHeader(String header) {
-    // map work ticket column header to firestore service name
-    String serviceCode;
-
-    switch (header.trim().toLowerCase()) {
-      case 'sample':
-        serviceCode = 'c6GasSample';
-        break;
-      case 'stain tube':
-        serviceCode = 'stainTube';
-        break;
-      case 'efm collect':
-        serviceCode = 'efmCollection';
-        break;
-      case 'travel':
-        serviceCode = 'travelTime';
-        break;
-      case 'tech time':
-        serviceCode = 'techTime';
-        break;
-      case 'miles':
-        serviceCode = 'mileage';
-        break;
-      default:
-        serviceCode = header.toLowerCase();
-    }
-
-    return serviceCode;
   }
 }
