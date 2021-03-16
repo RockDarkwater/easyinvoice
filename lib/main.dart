@@ -80,8 +80,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
     ImportBatch batch = await importController.import();
 
-    List<Job> jobs =
-        await importController.buildAccugasJobs(batch.spreadsheets.first);
+    List<Job> jobs = await importController.buildAmisJobs(batch.txtDocs[0]);
     double count = jobs.first.countCharges();
     print('${jobs.length} jobs. First: ${jobs.first.customer} - $count');
 

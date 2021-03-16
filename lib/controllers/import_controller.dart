@@ -16,18 +16,19 @@ class ImportController extends GetxController {
     FilePickerResult result =
         await FilePicker.platform.pickFiles(allowMultiple: true);
     List<Sheet> sheets = [];
-    Map<String, List<List<String>>> txtDocs = Map();
+    Map<int, List<List<String>>> txtDocs = Map();
     List<String> rows;
     Excel book;
     String testVal;
 
     //For each picked file, either add csv to txtDocs, or add excel to sheets
     result.files.forEach((element) async {
-      if (element.name.contains('.csv') || element.name.contains('.txt')) {
+      if (element.name.contains('.txt')) {
         //import text files
+        print('csv file');
         rows = LineSplitter().convert(String.fromCharCodes(element.bytes));
-        txtDocs['${element.name}'] = List.generate(rows.length, (index) {
-          return rows[index].split(',');
+        txtDocs[txtDocs.length] = List.generate(rows.length, (index) {
+          return rows[index].split('\t');
         });
       } else if (element.name.contains('.xls')) {
         //import excel files
@@ -52,7 +53,93 @@ class ImportController extends GetxController {
     return ImportBatch(spreadsheets: sheets, txtDocs: txtDocs);
   }
 
-  Future<List<Job>> buildAmisJobs(List<List<String>> data) {}
+  Future<List<Job>> buildAmisJobs(List<List<String>> data) async {
+    //core variables
+    FireBaseController flutterfire = Get.find();
+    List<Job> jobs = [];
+
+    //construction variables
+    Job job;
+    StationCharge stationCharge;
+    Map<Service, double> serviceMap = Map();
+    Service service;
+    double quantity;
+    int cycle;
+    bool orifice;
+
+    //job variables
+    String customer;
+    String techName;
+    String location;
+    var jobDate;
+
+    //station charge variables
+    String leaseName;
+    String leaseNumber;
+    String notes;
+
+    print('looping: ${data.length} times');
+    //for each row after header, add service charge to job-> station charge -> item map
+    for (int i = 1; i < data.length; i++) {
+      if (customer != data[i][0]) {
+        print('new customer: ${data[i][0]}');
+      }
+      //get raw data
+      customer = data[i][0];
+      techName = 'amis';
+      location = data[i][17];
+      leaseName = data[i][5];
+      leaseNumber = data[i][4];
+      notes = data[i][6];
+      cycle = int.parse(data[i][7]);
+      orifice = !notes.contains('EGM');
+      quantity = double.parse(data[i][11]);
+      service = await getChartService(cycle: cycle, orifice: orifice);
+
+      //check if job exists for same customer, if not make it.
+      job = jobs.firstWhere((job) => job.customer == customer, orElse: () {
+        print('job for $customer does not exist');
+        Job newJob = Job(
+            customer: customer,
+            techName: techName,
+            location: location,
+            jobDate: jobDate,
+            stationCharges: [
+              StationCharge(
+                leaseName: leaseName,
+                leaseNumber: leaseNumber,
+                notes: notes,
+                serviceMap: {service: quantity},
+                itemMap: {},
+              ),
+            ]);
+        jobs.add(newJob);
+        return newJob;
+      });
+
+      //check if station charge exists for job, if not, make it and then add it.
+      stationCharge = job.stationCharges
+          .firstWhere((charge) => charge.leaseName == leaseName, orElse: () {
+        StationCharge newCharge = StationCharge(
+          leaseName: leaseName,
+          leaseNumber: leaseNumber,
+          notes: notes,
+          serviceMap: {service: quantity},
+          itemMap: {},
+        );
+        job.stationCharges.add(newCharge);
+        return newCharge;
+      });
+
+      //check if station charge includes service, if not, make it.
+      if (serviceMap.containsKey(service)) {
+        serviceMap[service] += quantity;
+      } else {
+        serviceMap[service] = quantity;
+      }
+    }
+    return jobs;
+  }
 
   Future<List<Job>> buildAccugasJobs(Sheet data) async {
     //core variables
@@ -299,5 +386,35 @@ class ImportController extends GetxController {
     }
     // print('$value = $serviceName');
     return await fireBaseController.getService(serviceName);
+  }
+
+  Future<Service> getChartService({int cycle, bool orifice}) async {
+    FireBaseController controller = Get.find();
+    print('$cycle - $orifice');
+    String servCode;
+    if (orifice) {
+      switch (cycle) {
+        case 1:
+          servCode = 'chart24';
+          break;
+        case 7:
+          servCode = 'chart78';
+          break;
+        case 8:
+          servCode = 'chart78';
+          break;
+        case 16:
+          servCode = 'chart16';
+          break;
+        case 31:
+          servCode = 'chart31';
+          break;
+        default:
+          servCode = 'chart31';
+      }
+    } else
+      servCode = 'efmMeter';
+
+    return await controller.getService(servCode);
   }
 }
