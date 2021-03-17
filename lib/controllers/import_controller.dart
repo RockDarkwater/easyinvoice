@@ -91,9 +91,9 @@ class ImportController extends GetxController {
       leaseName = data[i][5];
       leaseNumber = data[i][4];
       notes = data[i][6];
-      cycle = int.parse(data[i][7]);
+      cycle = int.tryParse(data[i][7]) ?? 0;
       orifice = !notes.contains('EGM');
-      quantity = double.parse(data[i][11]);
+      quantity = double.tryParse(data[i][11]) ?? 0;
       service = await getChartService(cycle: cycle, orifice: orifice);
 
       //check if job exists for same customer, if not make it.
@@ -263,16 +263,16 @@ class ImportController extends GetxController {
           if (isItem) {
             //get Item
             item = await flutterfire.getItem(code);
-            itemMap[item] = double.parse(activeRow[j].toString());
+            itemMap[item] = double.tryParse(activeRow[j].toString()) ?? 0;
           } else if (isService) {
             // get Service
             service =
                 await flutterfire.getService(translateServiceHeader(code));
-            serviceMap[service] = double.parse(activeRow[j].toString());
+            serviceMap[service] = double.tryParse(activeRow[j].toString()) ?? 0;
           }
 
           print(
-              'chargeMap[${header[j].toString()}] = ${double.parse(activeRow[j].toString())}');
+              'chargeMap[${header[j].toString()}] = ${double.tryParse(activeRow[j].toString())}');
         }
         j++;
       }
