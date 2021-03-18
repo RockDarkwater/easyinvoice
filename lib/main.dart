@@ -5,8 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:get/get.dart';
 
-import 'models/job.dart';
-
 // Todo:
 
 // - multi-style import parsing button
@@ -72,37 +70,23 @@ class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
 
   Future<void> _incrementCounter() async {
-    // FireBaseController flutterfire = Get.find();
-    ImportController importController = Get.find();
-    // await uploadServicePrices();
-    // await refreshItems();
-    // await uploadCustomers();
-
-    ImportBatch batch = await importController.import();
-
-    List<Job> jobs = await importController.buildAmisJobs(batch.txtDocs[0]);
-    double count = jobs.first.countCharges();
-    print('${jobs.length} jobs. First: ${jobs.first.customer} - $count');
-
-    // print(
-    //     '${jobs.length} jobs. First: ${jobs.first.customer} - ${jobs.first.stationCharges.length} stations, ${jobs.first.countCharges()}');
-    // if (await testImport()) {
-    //   setState(() {
-    //     _counter++;
-    //   });
-    // }
+    await testImport();
+    setState(() {
+      _counter++;
+    });
 
     print('done!');
   }
 
-  Future<bool> testImport() async {
+  Future<void> testImport() async {
+    print('starting testImport...');
     ImportController controller = Get.find();
 
     ImportBatch batch = await controller.import();
 
-    for (var file in batch.spreadsheets) {
-      List<Job> jobs = await controller.buildAccugasJobs(file);
-    }
+    print('uploaded ${batch.jobs.length} jobs.');
+
+    return batch;
   }
 
   @override

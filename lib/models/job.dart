@@ -20,15 +20,12 @@ class Job {
 
   double countCharges() {
     double counter = 0;
-    print('counting...');
     for (var charge in stationCharges) {
-      print('counting ${charge.leaseName}');
       if (charge.itemMap != null) {
         for (var item in charge.itemMap.keys) {
           counter += charge.itemMap[item].toDouble();
         }
       }
-      print('items: $counter');
       if (charge.serviceMap != null) {
         for (var service in charge.serviceMap.keys) {
           counter += charge.serviceMap[service].toDouble();

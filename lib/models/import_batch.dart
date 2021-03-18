@@ -1,10 +1,7 @@
-import 'package:easyinvoice/models/job.dart';
-import 'package:excel/excel.dart';
+import 'job.dart';
 
 class ImportBatch {
-  List<Sheet> spreadsheets;
-  Map<int, List<List<String>>> txtDocs = Map();
-  List<Job> jobs = [];
+  final List<Job> jobs;
 
-  ImportBatch({this.spreadsheets, this.txtDocs});
+  ImportBatch(this.jobs);
 }
