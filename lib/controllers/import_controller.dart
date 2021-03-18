@@ -17,6 +17,7 @@ class ImportController extends GetxController {
         await FilePicker.platform.pickFiles(allowMultiple: true);
     List<Sheet> sheets = [];
     Map<int, List<List<String>>> txtDocs = Map();
+    List<Job> jobs = [];
     List<String> rows;
     Excel book;
     String testVal;

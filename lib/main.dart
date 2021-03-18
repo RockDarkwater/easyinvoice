@@ -9,7 +9,7 @@ import 'models/job.dart';
 
 // Todo:
 
-// - Move AMIS/AccuGas spreadsheet data into job/station/item structure
+// - multi-style import parsing button
 // - Function to find customer number from name string
 
 // - ui to interact with customers, prices, items, and services.
@@ -93,6 +93,16 @@ class _MyHomePageState extends State<MyHomePage> {
     // }
 
     print('done!');
+  }
+
+  Future<bool> testImport() async {
+    ImportController controller = Get.find();
+
+    ImportBatch batch = await controller.import();
+
+    for (var file in batch.spreadsheets) {
+      List<Job> jobs = await controller.buildAccugasJobs(file);
+    }
   }
 
   @override
