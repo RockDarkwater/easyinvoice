@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easyinvoice/controllers/firebase_controller.dart';
 import 'package:easyinvoice/models/import_batch.dart';
@@ -23,21 +22,22 @@ class ImportController extends GetxController {
     Excel book;
 
     //For each picked file, either add csv to txtDocs, or add excel to sheets
-    result.files.forEach((element) async {
-      if (element.name.contains('.txt')) {
+    for (int i = 0; i < result.files.length; i++) {
+      if (result.files[i].name.contains('.txt')) {
         //import text files
         print('txt file');
-        rows = LineSplitter().convert(String.fromCharCodes(element.bytes));
+        rows =
+            LineSplitter().convert(String.fromCharCodes(result.files[i].bytes));
         txtFile = List.generate(rows.length, (index) {
           return rows[index].split('\t');
         });
 
         jobs += await buildAmisJobs(txtFile);
-      } else if (element.name.contains('.xls')) {
+      } else if (result.files[i].name.contains('.xls')) {
         //import excel files
         print(
-            'filetype: ${element.name.substring(element.name.indexOf('.'), element.name.length)}');
-        book = Excel.decodeBytes(element.bytes);
+            'filetype: ${result.files[i].name.substring(result.files[i].name.indexOf('.'), result.files[i].name.length)}');
+        book = Excel.decodeBytes(result.files[i].bytes);
 
         // Convert from Amis
         if (book.sheets.keys.contains('Billing_Export'))
@@ -48,10 +48,9 @@ class ImportController extends GetxController {
           jobs.add(job);
         }
       } else {
-        print('${element.name} is not text or excel');
+        print('${result.files[i].name} is not text or excel');
       }
-    });
-
+    }
     return ImportBatch(jobs);
   }
 
@@ -79,7 +78,7 @@ class ImportController extends GetxController {
     String leaseName;
     String leaseNumber;
     String notes;
-
+    print('looping through ${data.length} rows');
     //for each row after header, add service charge to job-> station charge -> item map
     for (int i = 1; i < data.length; i++) {
       if (customer != data[i][0]) {}
@@ -97,6 +96,7 @@ class ImportController extends GetxController {
 
       //check if job exists for same customer, if not make it.
       job = jobs.firstWhere((job) => job.customer == customer, orElse: () {
+        print('new customer job: $customer');
         Job newJob = Job(
             customer: customer,
             techName: techName,
@@ -300,16 +300,13 @@ class ImportController extends GetxController {
   Future<bool> checkExist(String collection, String docID) async {
     bool exists = false;
     FireBaseController fireBaseController = Get.find();
+
     try {
-      await fireBaseController.firebase
-          .doc('$collection/$docID')
-          .get()
-          .then((doc) {
-        if (doc.exists)
-          exists = true;
-        else
-          exists = false;
-      });
+      QuerySnapshot qry =
+          await fireBaseController.firebase.collection('$collection').get();
+      DocumentReference doc =
+          fireBaseController.firebase.doc('$collection/$docID');
+      exists = qry.docs.contains(doc);
       return exists;
     } catch (e) {
       return false;

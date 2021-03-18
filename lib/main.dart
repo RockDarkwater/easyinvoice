@@ -85,8 +85,6 @@ class _MyHomePageState extends State<MyHomePage> {
     ImportBatch batch = await controller.import();
 
     print('uploaded ${batch.jobs.length} jobs.');
-
-    return batch;
   }
 
   @override
