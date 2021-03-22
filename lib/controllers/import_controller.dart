@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easyinvoice/controllers/firebase_controller.dart';
-import 'package:easyinvoice/models/import_batch.dart';
 import 'package:easyinvoice/models/item.dart';
 import 'package:easyinvoice/models/job.dart';
 import 'package:easyinvoice/models/service.dart';
@@ -11,13 +10,13 @@ import 'package:file_picker/file_picker.dart';
 import 'package:get/get.dart';
 
 class ImportController extends GetxController {
-  Future<ImportBatch> import() async {
+  RxList<Job> jobs = <Job>[].obs;
+
+  Future<void> import() async {
     print('starting import.');
     FilePickerResult result =
         await FilePicker.platform.pickFiles(allowMultiple: true);
-    List<Job> jobs = [];
     List<List<String>> txtFile;
-    Job job;
     List<String> rows;
     Excel book;
 
@@ -32,7 +31,7 @@ class ImportController extends GetxController {
           return rows[index].split('\t');
         });
 
-        jobs += await buildAmisJobs(txtFile);
+        await buildAmisJobs(txtFile);
       } else if (result.files[i].name.contains('.xls')) {
         //import excel files
         print(
@@ -41,28 +40,23 @@ class ImportController extends GetxController {
 
         // Convert from Amis
         if (book.sheets.keys.contains('Billing_Export'))
-          jobs += await buildAccugasJobs(book['Billing_Export']);
+          await buildAccugasJobs(book['Billing_Export']);
         // Convert from Work Ticket
         if (book.sheets.keys.contains('Work Ticket')) {
-          job = await buildWorkTicketJob(book['Work Ticket']);
-          jobs.add(job);
+          await buildWorkTicketJob(book['Work Ticket']);
         }
       } else {
         print('${result.files[i].name} is not text or excel');
       }
     }
-    return ImportBatch(jobs);
   }
 
-  Future<List<Job>> buildAmisJobs(List<List<String>> data) async {
+  Future<void> buildAmisJobs(List<List<String>> data) async {
     print('starting Amis import.');
-    //core variables
-    List<Job> jobs = [];
 
     //construction variables
     Job job;
     StationCharge stationCharge;
-    Map<Service, double> serviceMap = Map();
     Service service;
     double quantity;
     int cycle;
@@ -94,7 +88,8 @@ class ImportController extends GetxController {
       quantity = double.tryParse(data[i][11]) ?? 0;
       service = await getChartService(cycle: cycle, orifice: orifice);
 
-      //check if job exists for same customer, if not make it.
+      // check if job exists for same customer.
+      //   - if not make it with the current line station charge.
       job = jobs.firstWhere((job) => job.customer == customer, orElse: () {
         print('new customer job: $customer');
         Job newJob = Job(
@@ -115,9 +110,11 @@ class ImportController extends GetxController {
         return newJob;
       });
 
-      //check if station charge exists for job, if not, make it and then add it.
+      // if job exists, check if station charge has been created.
+      //  - if not, make it and then add the line charge.
       stationCharge = job.stationCharges
           .firstWhere((charge) => charge.leaseName == leaseName, orElse: () {
+        print('new station charge job: $leaseName');
         StationCharge newCharge = StationCharge(
           leaseName: leaseName,
           leaseNumber: leaseNumber,
@@ -129,25 +126,22 @@ class ImportController extends GetxController {
         return newCharge;
       });
 
-      //check if station charge includes service, if not, make it.
-      if (serviceMap.containsKey(service)) {
-        serviceMap[service] += quantity;
+      // if station has the current charge, add additional quantity.
+      // if not, add service & quantity to charge map.
+      if (stationCharge.serviceMap.containsKey(service)) {
+        stationCharge.serviceMap[service] += quantity;
       } else {
-        serviceMap[service] = quantity;
+        stationCharge.serviceMap[service] = quantity;
       }
     }
-    return jobs;
   }
 
-  Future<List<Job>> buildAccugasJobs(Sheet data) async {
+  Future<void> buildAccugasJobs(Sheet data) async {
     print('starting AccuGas import.');
-    //core variables
-    List<Job> jobs = [];
 
     //construction variables
     Job job;
     StationCharge stationCharge;
-    Map<Service, double> serviceMap = Map();
     Service service;
 
     //job variables
@@ -208,16 +202,15 @@ class ImportController extends GetxController {
       });
 
       //check if station charge includes service, if not, make it.
-      if (serviceMap.containsKey(service)) {
-        serviceMap[service]++;
+      if (stationCharge.serviceMap.containsKey(service)) {
+        stationCharge.serviceMap[service]++;
       } else {
-        serviceMap[service] = 1;
+        stationCharge.serviceMap[service] = 1;
       }
     }
-    return jobs;
   }
 
-  Future<Job> buildWorkTicketJob(Sheet data) async {
+  Future<void> buildWorkTicketJob(Sheet data) async {
     //set normal
     print('starting WT import');
     FireBaseController flutterfire = Get.find();
@@ -286,7 +279,7 @@ class ImportController extends GetxController {
       itemMap.clear();
       serviceMap.clear();
     }
-    return Job(
+    jobs.add(Job(
       customer: customer,
       techName: techName,
       poNumber: poNumber,
@@ -294,7 +287,7 @@ class ImportController extends GetxController {
       location: location,
       jobDate: jobDate,
       stationCharges: stationCharges,
-    );
+    ));
   }
 
   Future<bool> checkExist(String collection, String docID) async {
