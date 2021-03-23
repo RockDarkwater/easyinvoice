@@ -1,4 +1,7 @@
+import 'package:easyinvoice/components/firebase_curation_functions.dart';
 import 'package:easyinvoice/controllers/import_controller.dart';
+import 'package:easyinvoice/test/test_objects.dart';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -25,8 +28,28 @@ class UploadScreen extends StatelessWidget {
                       style: BorderStyle.solid)),
             ),
             Obx(
-              () => controller.jobs.length > 0
-                  ? Container(
+              () => controller.jobs.length == 0
+                  ? Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        Text(
+                          'Click the button to upload files:',
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(top: 15.0),
+                          child: FloatingActionButton(
+                            onPressed: () async {
+                              // await uploadCustomers();
+                              controller.jobs.add(await testJob());
+                              // controller.import();
+                            },
+                            tooltip: 'Increment',
+                            child: Icon(Icons.add),
+                          ),
+                        ),
+                      ],
+                    )
+                  : Container(
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
@@ -38,7 +61,7 @@ class UploadScreen extends StatelessWidget {
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 FloatingActionButton(
-                                  onPressed: () => controller.import,
+                                  onPressed: () async => controller.import,
                                   child: Icon(Icons.remove),
                                 ),
                                 SizedBox(
@@ -53,22 +76,6 @@ class UploadScreen extends StatelessWidget {
                           ),
                         ],
                       ),
-                    )
-                  : Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: <Widget>[
-                        Text(
-                          'Click the button to upload files:',
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(top: 15.0),
-                          child: FloatingActionButton(
-                            onPressed: controller.import,
-                            tooltip: 'Increment',
-                            child: Icon(Icons.add),
-                          ),
-                        ),
-                      ],
                     ),
             ),
           ],

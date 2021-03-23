@@ -1,7 +1,8 @@
+import 'package:easyinvoice/models/customer.dart';
 import 'package:easyinvoice/models/station_charge.dart';
 
 class Job {
-  String customer;
+  Customer customer;
   String techName;
   String poNumber;
   String requisitioner;

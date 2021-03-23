@@ -1,12 +1,15 @@
 import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easyinvoice/controllers/firebase_controller.dart';
+import 'package:easyinvoice/models/customer.dart';
 import 'package:easyinvoice/models/item.dart';
 import 'package:easyinvoice/models/job.dart';
 import 'package:easyinvoice/models/service.dart';
 import 'package:easyinvoice/models/station_charge.dart';
 import 'package:excel/excel.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class ImportController extends GetxController {
@@ -63,7 +66,7 @@ class ImportController extends GetxController {
     bool orifice;
 
     //job variables
-    String customer;
+    Customer customer;
     String techName;
     String location;
     var jobDate;
@@ -75,9 +78,9 @@ class ImportController extends GetxController {
     print('looping through ${data.length} rows');
     //for each row after header, add service charge to job-> station charge -> item map
     for (int i = 1; i < data.length; i++) {
-      if (customer != data[i][0]) {}
+      if (customer.custNum != data[i][0]) {}
       //get raw data
-      customer = data[i][0];
+      customer = await parseCustomer(data[i][0]);
       techName = 'amis';
       location = data[i][17];
       leaseName = data[i][5];
@@ -141,11 +144,12 @@ class ImportController extends GetxController {
 
     //construction variables
     Job job;
+    String custNum;
     StationCharge stationCharge;
     Service service;
 
     //job variables
-    String customer;
+    Customer customer;
     String techName;
     String location;
     var jobDate;
@@ -158,7 +162,7 @@ class ImportController extends GetxController {
     //for each row after header, add service charge to job-> station charge -> item map
     for (int i = 2; i < data.maxRows; i++) {
       //get raw data
-      customer = data.cell(CellIndex.indexByString("C$i")).value.toString();
+      custNum = data.cell(CellIndex.indexByString("C$i")).value.toString();
       techName = data.cell(CellIndex.indexByString("BA$i")).value.toString();
       location = data.cell(CellIndex.indexByString("AX$i")).value.toString();
       jobDate = data.cell(CellIndex.indexByString("I$i")).value;
@@ -166,9 +170,11 @@ class ImportController extends GetxController {
       leaseNumber = data.cell(CellIndex.indexByString("D$i")).value.toString();
       notes = data.cell(CellIndex.indexByString("M$i")).value.toString();
       service = await getGasService(notes);
+      customer = await parseCustomer(custNum);
 
       //check if job exists for same customer, if not make it.
-      job = jobs.firstWhere((job) => job.customer == customer, orElse: () {
+      job =
+          jobs.firstWhere((job) => job.customer.custNum == custNum, orElse: () {
         Job newJob = Job(
             customer: customer,
             techName: techName,
@@ -214,7 +220,8 @@ class ImportController extends GetxController {
     //set normal
     print('starting WT import');
     FireBaseController flutterfire = Get.find();
-    String customer = data.cell(CellIndex.indexByString('B2')).value.toString();
+    Customer customer = await parseCustomer(
+        data.cell(CellIndex.indexByString('B2')).value.toString());
     String techName = data.cell(CellIndex.indexByString('B4')).value.toString();
     String poNumber = data.cell(CellIndex.indexByString('K3')).value.toString();
     String requisitioner =
@@ -390,5 +397,68 @@ class ImportController extends GetxController {
       servCode = 'efmMeter';
 
     return await controller.getService(servCode);
+  }
+
+  Future<Customer> parseCustomer(String customer) async {
+    FireBaseController controller = Get.find();
+    QuerySnapshot qry;
+    List<String> searchVals;
+
+    // if customer given is entirely numeric, assume customer number and build
+    if (int.tryParse(customer.substring(0, 2)) != null) {
+      print('customer request is numeric: $customer');
+      return await controller.getCustomer('$customer');
+    }
+
+    // if non-numeric, search each word and compile a list of potential customers
+    searchVals =
+        customer.toLowerCase().replaceAll(RegExp(r"[^\s\w]"), '').split(' ');
+    searchVals.removeWhere((element) => element.length == 0);
+
+    qry = await controller.firebase
+        .collection('customers')
+        .where('searchValues', arrayContainsAny: searchVals)
+        .get();
+
+    print('found ${qry.docs.length} documents ');
+
+    if (qry.docs.length > 1) {
+      Get.dialog(
+        AlertDialog(
+          content: Container(
+            height: 400,
+            width: 800,
+            child: Column(
+              children: [
+                Flexible(
+                  child: ListView.builder(
+                      itemCount: qry.docs.length,
+                      scrollDirection: Axis.vertical,
+                      itemBuilder: (context, index) {
+                        return ListTile(
+                          title: Text(
+                            'Customer: ${qry.docs[index].data()['billingName']}',
+                            style: TextStyle(
+                                color: Colors.black,
+                                decoration: TextDecoration.none),
+                          ),
+                          onTap: () async {
+                            Get.back();
+                            return await controller.getCustomer(qry.docs
+                                .firstWhere((element) =>
+                                    element.id == qry.docs[index].id)
+                                .id);
+                          },
+                          focusColor: Colors.white54,
+                        );
+                      }),
+                ),
+              ],
+            ),
+          ),
+        ),
+        barrierColor: Colors.white70,
+      );
+    }
   }
 }

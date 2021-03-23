@@ -219,6 +219,7 @@ Future<void> uploadCustomers() async {
                   'fieldMethod': rowMap[20] ?? 'byLease',
                   'noChargeArray': rowMap[21] ?? '',
                   'convertArray': rowMap[22] ?? '',
+                  'searchValues': cleanStringListFromName(rowMap[3]),
                 });
             print('added: ${rowMap[3]}');
           }
@@ -235,6 +236,14 @@ Future<void> uploadCustomers() async {
           'File not formatted correctly. Make sure you chose the AccuGas Customer List');
     }
   }
+  print('All Done.');
+}
+
+List<String> cleanStringListFromName(String name) {
+  List<String> list =
+      name.toLowerCase().replaceAll(RegExp(r"[^\s\w]"), '').split(' ');
+  list.removeWhere((element) => element.length == 0);
+  return list;
 }
 
 Future<void> uploadServicePrices() async {

@@ -43,7 +43,7 @@ class App extends StatelessWidget {
         // Once complete, show your application
         if (snapshot.connectionState == ConnectionState.done) {
           // Start Authentication
-          return MaterialApp(
+          return GetMaterialApp(
               title: 'Flutter Demo',
               theme: ThemeData(
                 primarySwatch: Colors.deepOrange,
