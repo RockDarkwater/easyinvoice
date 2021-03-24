@@ -8,10 +8,10 @@ import 'package:get/get.dart';
 Future<Job> testJob() async {
   ImportController controller = Get.find();
   Service gas = await controller.getGasService('Spot');
-
-  await controller.parseCustomer('BTA').then((value) {
+  Customer cust = await controller.parseCustomer('BTA');
+  if (cust != null) {
     return Job(
-      customer: value,
+      customer: cust,
       techName: 'Johnny Horton',
       stationCharges: [
         StationCharge(
@@ -29,5 +29,5 @@ Future<Job> testJob() async {
             }),
       ],
     );
-  });
+  }
 }

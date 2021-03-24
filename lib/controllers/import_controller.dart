@@ -403,9 +403,11 @@ class ImportController extends GetxController {
     FireBaseController controller = Get.find();
     QuerySnapshot qry;
     List<String> searchVals;
+    Customer cust;
 
     // if customer given is entirely numeric, assume customer number and build
     if (int.tryParse(customer.substring(0, 2)) != null) {
+      // TODO: and if only 1 word
       print('customer request is numeric: $customer');
       return await controller.getCustomer('$customer');
     }
@@ -423,7 +425,7 @@ class ImportController extends GetxController {
     print('found ${qry.docs.length} documents ');
 
     if (qry.docs.length > 1) {
-      Get.dialog(
+      return await Get.dialog(
         AlertDialog(
           content: Container(
             height: 400,
@@ -443,11 +445,10 @@ class ImportController extends GetxController {
                                 decoration: TextDecoration.none),
                           ),
                           onTap: () async {
-                            Get.back();
-                            return await controller.getCustomer(qry.docs
-                                .firstWhere((element) =>
-                                    element.id == qry.docs[index].id)
-                                .id);
+                            print(qry.docs[index].id);
+                            cust = await controller
+                                .getCustomer(qry.docs[index].id);
+                            Get.back(result: cust);
                           },
                           focusColor: Colors.white54,
                         );

@@ -40,8 +40,8 @@ class UploadScreen extends StatelessWidget {
                           child: FloatingActionButton(
                             onPressed: () async {
                               // await uploadCustomers();
-                              controller.jobs.add(await testJob());
-                              // controller.import();
+                              // controller.jobs.add(await testJob());
+                              await controller.import();
                             },
                             tooltip: 'Increment',
                             child: Icon(Icons.add),
