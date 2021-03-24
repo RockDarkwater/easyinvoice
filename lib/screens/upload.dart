@@ -1,6 +1,5 @@
-import 'package:easyinvoice/components/firebase_curation_functions.dart';
 import 'package:easyinvoice/controllers/import_controller.dart';
-import 'package:easyinvoice/test/test_objects.dart';
+import 'package:easyinvoice/screens/batch_overview.dart';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -27,56 +26,27 @@ class UploadScreen extends StatelessWidget {
                       width: 10.0,
                       style: BorderStyle.solid)),
             ),
-            Obx(
-              () => controller.jobs.length == 0
-                  ? Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: <Widget>[
-                        Text(
-                          'Click the button to upload files:',
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(top: 15.0),
-                          child: FloatingActionButton(
-                            onPressed: () async {
-                              // await uploadCustomers();
-                              // controller.jobs.add(await testJob());
-                              await controller.import();
-                            },
-                            tooltip: 'Increment',
-                            child: Icon(Icons.add),
-                          ),
-                        ),
-                      ],
-                    )
-                  : Container(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                              'Click \' - \' to remove the ${controller.jobs.length} jobs, Click \' + \' to add more.'),
-                          Padding(
-                            padding: const EdgeInsets.only(top: 15.0),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                FloatingActionButton(
-                                  onPressed: () async => controller.import,
-                                  child: Icon(Icons.remove),
-                                ),
-                                SizedBox(
-                                  width: 15.0,
-                                ),
-                                FloatingActionButton(
-                                  onPressed: () => controller.jobs.clear(),
-                                  child: Icon(Icons.add),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
+            Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Text(
+                  'Click the button to upload files:',
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(top: 15.0),
+                  child: FloatingActionButton(
+                    onPressed: () async {
+                      // await uploadCustomers();
+                      // controller.jobs.add(await testJob());
+                      Get.to(OverviewScreen(),
+                          transition: Transition.noTransition);
+                      // await controller.import();
+                    },
+                    tooltip: 'Increment',
+                    child: Icon(Icons.add),
+                  ),
+                ),
+              ],
             ),
           ],
         ),

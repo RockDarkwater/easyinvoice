@@ -1,6 +1,5 @@
 import 'package:easyinvoice/controllers/firebase_controller.dart';
 import 'package:easyinvoice/controllers/import_controller.dart';
-import 'package:easyinvoice/screens/batch_overview.dart';
 import 'package:easyinvoice/screens/upload.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -44,15 +43,13 @@ class App extends StatelessWidget {
         if (snapshot.connectionState == ConnectionState.done) {
           // Start Authentication
           return GetMaterialApp(
-              title: 'Flutter Demo',
-              theme: ThemeData(
+            title: 'Flutter Demo',
+            theme: ThemeData(
                 primarySwatch: Colors.deepOrange,
-              ),
-              home: Obx(
-                () => (controller.jobs.length > 0)
-                    ? OverviewScreen()
-                    : UploadScreen(),
-              ));
+                primaryColor: Colors.orange,
+                accentColor: Colors.white70),
+            home: UploadScreen(),
+          );
         }
         // Otherwise, show progress indicator whilst waiting for initialization to complete
         return CircularProgressIndicator();

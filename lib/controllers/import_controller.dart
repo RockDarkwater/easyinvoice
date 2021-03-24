@@ -78,9 +78,10 @@ class ImportController extends GetxController {
     print('looping through ${data.length} rows');
     //for each row after header, add service charge to job-> station charge -> item map
     for (int i = 1; i < data.length; i++) {
-      if (customer.custNum != data[i][0]) {}
+      print('Row Customer: ${data[i][0]}');
+      if (customer.custNum != data[i][0])
+        customer = await parseCustomer(data[i][0]);
       //get raw data
-      customer = await parseCustomer(data[i][0]);
       techName = 'amis';
       location = data[i][17];
       leaseName = data[i][5];
@@ -137,6 +138,7 @@ class ImportController extends GetxController {
         stationCharge.serviceMap[service] = quantity;
       }
     }
+    print('ending Amis import.');
   }
 
   Future<void> buildAccugasJobs(Sheet data) async {
@@ -402,24 +404,24 @@ class ImportController extends GetxController {
   Future<Customer> parseCustomer(String customer) async {
     FireBaseController controller = Get.find();
     QuerySnapshot qry;
+    QuerySnapshot testQry;
     List<String> searchVals;
-    Customer cust;
 
-    // if customer given is entirely numeric, assume customer number and build
-    if (int.tryParse(customer.substring(0, 2)) != null) {
-      // TODO: and if only 1 word
+    // if customer given is primarily numeric and only one word, assume customer number and build
+    if (int.tryParse(customer.substring(0, 2)) != null &&
+        customer.split(' ').length == 1) {
       print('customer request is numeric: $customer');
       return await controller.getCustomer('$customer');
     }
 
-    // if non-numeric, search each word and compile a list of potential customers
+    // if non-numeric or multi-word, search each word and compile a list of potential customers
     searchVals =
         customer.toLowerCase().replaceAll(RegExp(r"[^\s\w]"), '').split(' ');
     searchVals.removeWhere((element) => element.length == 0);
 
     qry = await controller.firebase
         .collection('customers')
-        .where('searchValues', arrayContainsAny: searchVals)
+        .where('searchValues', arrayContains: searchVals[0])
         .get();
 
     print('found ${qry.docs.length} documents ');
@@ -432,6 +434,10 @@ class ImportController extends GetxController {
             width: 800,
             child: Column(
               children: [
+                Text(
+                  'Choose customer number for $customer',
+                  style: TextStyle(fontSize: 24, color: Colors.deepOrange[800]),
+                ),
                 Flexible(
                   child: ListView.builder(
                       itemCount: qry.docs.length,
@@ -439,16 +445,16 @@ class ImportController extends GetxController {
                       itemBuilder: (context, index) {
                         return ListTile(
                           title: Text(
-                            'Customer: ${qry.docs[index].data()['billingName']}',
+                            'C - ${qry.docs[index].id}: ${qry.docs[index].data()['billingName']}',
                             style: TextStyle(
                                 color: Colors.black,
                                 decoration: TextDecoration.none),
                           ),
                           onTap: () async {
                             print(qry.docs[index].id);
-                            cust = await controller
-                                .getCustomer(qry.docs[index].id);
-                            Get.back(result: cust);
+                            Get.back(
+                                result: await controller
+                                    .getCustomer(qry.docs[index].id));
                           },
                           focusColor: Colors.white54,
                         );
