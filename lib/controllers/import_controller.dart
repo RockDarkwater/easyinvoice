@@ -14,6 +14,10 @@ import 'package:get/get.dart';
 
 class ImportController extends GetxController {
   RxList<Job> jobs = <Job>[].obs;
+  RxInt importQty = 1.obs;
+  RxInt currentImport = 0.obs;
+  RxInt processQty = 1.obs;
+  RxInt currentProcess = 0.obs;
 
   Future<void> import() async {
     print('starting import.');
@@ -23,6 +27,7 @@ class ImportController extends GetxController {
     List<String> rows;
     Excel book;
 
+    importQty.value = result.files.length;
     //For each picked file, either add csv to txtDocs, or add excel to sheets
     for (int i = 0; i < result.files.length; i++) {
       if (result.files[i].name.contains('.txt')) {
@@ -51,7 +56,10 @@ class ImportController extends GetxController {
       } else {
         print('${result.files[i].name} is not text or excel');
       }
+      currentImport.value = i;
     }
+    currentImport.value = 0;
+    importQty.value = 1;
   }
 
   Future<void> buildAmisJobs(List<List<String>> data) async {
@@ -76,10 +84,12 @@ class ImportController extends GetxController {
     String leaseNumber;
     String notes;
     print('looping through ${data.length} rows');
+    processQty.value = data.length;
     //for each row after header, add service charge to job-> station charge -> item map
     for (int i = 1; i < data.length; i++) {
-      print('Row Customer: ${data[i][0]}');
-      if (customer.custNum != data[i][0])
+      currentProcess.value = i;
+      // print('Row Customer: ${data[i][0]}');
+      if (customer?.custNum != data[i][0])
         customer = await parseCustomer(data[i][0]);
       //get raw data
       techName = 'amis';
@@ -94,8 +104,9 @@ class ImportController extends GetxController {
 
       // check if job exists for same customer.
       //   - if not make it with the current line station charge.
-      job = jobs.firstWhere((job) => job.customer == customer, orElse: () {
-        print('new customer job: $customer');
+      job = jobs.firstWhere((job) => job.customer.custNum == customer.custNum,
+          orElse: () {
+        // print('new customer job: ${customer.billingName}');
         Job newJob = Job(
             customer: customer,
             techName: techName,
@@ -118,7 +129,7 @@ class ImportController extends GetxController {
       //  - if not, make it and then add the line charge.
       stationCharge = job.stationCharges
           .firstWhere((charge) => charge.leaseName == leaseName, orElse: () {
-        print('new station charge job: $leaseName');
+        // print('new station charge job: $leaseName');
         StationCharge newCharge = StationCharge(
           leaseName: leaseName,
           leaseNumber: leaseNumber,
@@ -138,6 +149,8 @@ class ImportController extends GetxController {
         stationCharge.serviceMap[service] = quantity;
       }
     }
+    processQty.value = 0;
+    currentProcess.value = 0;
     print('ending Amis import.');
   }
 
@@ -161,9 +174,11 @@ class ImportController extends GetxController {
     String leaseNumber;
     String notes;
 
+    processQty.value = data.maxRows;
     //for each row after header, add service charge to job-> station charge -> item map
     for (int i = 2; i < data.maxRows; i++) {
       //get raw data
+      currentProcess.value = i;
       custNum = data.cell(CellIndex.indexByString("C$i")).value.toString();
       techName = data.cell(CellIndex.indexByString("BA$i")).value.toString();
       location = data.cell(CellIndex.indexByString("AX$i")).value.toString();
@@ -175,8 +190,8 @@ class ImportController extends GetxController {
       customer = await parseCustomer(custNum);
 
       //check if job exists for same customer, if not make it.
-      job =
-          jobs.firstWhere((job) => job.customer.custNum == custNum, orElse: () {
+      job = jobs.firstWhere((job) => job.customer.custNum == customer.custNum,
+          orElse: () {
         Job newJob = Job(
             customer: customer,
             techName: techName,
@@ -196,8 +211,8 @@ class ImportController extends GetxController {
       });
 
       //check if station charge exists for job, if not, make it and then add it.
-      stationCharge = job.stationCharges
-          .firstWhere((charge) => charge.leaseName == leaseName, orElse: () {
+      stationCharge = job.stationCharges.firstWhere(
+          (charge) => charge.leaseNumber == leaseNumber, orElse: () {
         StationCharge newCharge = StationCharge(
           leaseName: leaseName,
           leaseNumber: leaseNumber,
@@ -216,6 +231,9 @@ class ImportController extends GetxController {
         stationCharge.serviceMap[service] = 1;
       }
     }
+    processQty.value = 1;
+    currentProcess.value = 0;
+    print('ending Accugas import.');
   }
 
   Future<void> buildWorkTicketJob(Sheet data) async {
@@ -403,69 +421,84 @@ class ImportController extends GetxController {
 
   Future<Customer> parseCustomer(String customer) async {
     FireBaseController controller = Get.find();
+    Customer cust;
     QuerySnapshot qry;
-    QuerySnapshot testQry;
     List<String> searchVals;
 
     // if customer given is primarily numeric and only one word, assume customer number and build
     if (int.tryParse(customer.substring(0, 2)) != null &&
         customer.split(' ').length == 1) {
-      print('customer request is numeric: $customer');
-      return await controller.getCustomer('$customer');
+      String testCust = customer.toString();
+      // print('customer request is numeric: $customer');
+      cust = await controller?.getCustomer('$customer');
+      while (cust == null && testCust.substring(0, 1) == '0') {
+        print('couldn\'t find $testCust, removing zero');
+        testCust = testCust.substring(1, testCust.length);
+        print('getting $testCust');
+        cust = await controller?.getCustomer('$testCust');
+      }
     }
 
-    // if non-numeric or multi-word, search each word and compile a list of potential customers
-    searchVals =
-        customer.toLowerCase().replaceAll(RegExp(r"[^\s\w]"), '').split(' ');
-    searchVals.removeWhere((element) => element.length == 0);
+    if (cust == null) {
+      print('searching string $customer');
+      // if non-numeric or multi-word, search each word and compile a list of potential customers
+      searchVals =
+          customer.toLowerCase().replaceAll(RegExp(r"[^\s\w]"), '').split(' ');
+      searchVals.removeWhere((element) => element.length == 0);
 
-    qry = await controller.firebase
-        .collection('customers')
-        .where('searchValues', arrayContains: searchVals[0])
-        .get();
+      qry = await controller.firebase
+          .collection('customers')
+          ?.where('searchValues', arrayContains: searchVals[0])
+          ?.get();
+      if (qry == null) print('could not find ${searchVals[0]}');
 
-    print('found ${qry.docs.length} documents ');
+      print('found ${qry.docs.length} documents ');
 
-    if (qry.docs.length > 1) {
-      return await Get.dialog(
-        AlertDialog(
-          content: Container(
-            height: 400,
-            width: 800,
-            child: Column(
-              children: [
-                Text(
-                  'Choose customer number for $customer',
-                  style: TextStyle(fontSize: 24, color: Colors.deepOrange[800]),
-                ),
-                Flexible(
-                  child: ListView.builder(
-                      itemCount: qry.docs.length,
-                      scrollDirection: Axis.vertical,
-                      itemBuilder: (context, index) {
-                        return ListTile(
-                          title: Text(
-                            'C - ${qry.docs[index].id}: ${qry.docs[index].data()['billingName']}',
-                            style: TextStyle(
-                                color: Colors.black,
-                                decoration: TextDecoration.none),
-                          ),
-                          onTap: () async {
-                            print(qry.docs[index].id);
-                            Get.back(
-                                result: await controller
-                                    .getCustomer(qry.docs[index].id));
-                          },
-                          focusColor: Colors.white54,
-                        );
-                      }),
-                ),
-              ],
+      if (qry.docs.length > 1) {
+        return await Get.dialog(
+          AlertDialog(
+            content: Container(
+              height: 400,
+              width: 800,
+              child: Column(
+                children: [
+                  Text(
+                    'Choose customer number for $customer',
+                    style:
+                        TextStyle(fontSize: 24, color: Colors.deepOrange[800]),
+                  ),
+                  Flexible(
+                    child: ListView.builder(
+                        itemCount: qry.docs.length,
+                        scrollDirection: Axis.vertical,
+                        itemBuilder: (context, index) {
+                          return ListTile(
+                            title: Text(
+                              'C - ${qry.docs[index].id}: ${qry.docs[index].data()['billingName']}',
+                              style: TextStyle(
+                                  color: Colors.black,
+                                  decoration: TextDecoration.none),
+                            ),
+                            onTap: () async {
+                              print(qry.docs[index].id);
+                              Get.back(
+                                  result: await controller
+                                      .getCustomer(qry.docs[index].id));
+                            },
+                            focusColor: Colors.white54,
+                          );
+                        }),
+                  ),
+                ],
+              ),
             ),
           ),
-        ),
-        barrierColor: Colors.white70,
-      );
-    }
+          barrierColor: Colors.white70,
+        );
+      } else {
+        return await controller.getCustomer(qry.docs.first.id);
+      }
+    } else
+      return cust;
   }
 }

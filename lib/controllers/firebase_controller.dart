@@ -43,51 +43,54 @@ class FireBaseController extends GetxController {
     double taxRate;
     bool ccFee;
 
-    doc = await firebase.collection('customers').doc('$custNum').get();
-    doc2 = await firebase.collection('servicePrices').doc('$custNum').get();
+    doc = await firebase.collection('customers')?.doc('$custNum')?.get();
+    doc2 = await firebase.collection('servicePrices')?.doc('$custNum')?.get();
 
-    primarySubmit = SubmitOption.values.firstWhere((element) =>
-        element.toString().split('.')[1] ==
-        doc.data()['primarySubmit'].toString());
-    billingName = doc.data()['billingName'];
-    priceMap = doc2.data();
-    add1 = doc.data()['add1'];
-    add2 = doc.data()['add2'];
-    add3 = doc.data()['add3'];
-    secondarySubmit = SubmitOption.values.firstWhere(
-        (element) =>
-            element.toString().split('.')[1] == doc.data()['secondarySubmit'],
-        orElse: () => SubmitOption.none);
-    city = doc.data()['city'];
-    state = doc.data()['state'];
-    zip = doc.data()['zip'].toString();
-    custClass = doc.data()['custClass'];
-    distList = doc.data()['distList'];
-    fieldArea = doc.data()['fieldArea'];
-    poNum = doc.data()['poNum'];
-    requisitioner = doc.data()['requisitioner'];
-    taxRate = doc.data()['taxRate'] ?? 8.25;
-    ccFee = doc.data()['ccFee'];
+    if (doc.data() != null) {
+      primarySubmit = SubmitOption.values.firstWhere((element) =>
+          element.toString().split('.')[1] ==
+          doc.data()['primarySubmit'].toString());
+      billingName = doc.data()['billingName'];
+      priceMap = doc2.data();
+      add1 = doc.data()['add1'];
+      add2 = doc.data()['add2'];
+      add3 = doc.data()['add3'];
+      secondarySubmit = SubmitOption.values.firstWhere(
+          (element) =>
+              element.toString().split('.')[1] == doc.data()['secondarySubmit'],
+          orElse: () => SubmitOption.none);
+      city = doc.data()['city'];
+      state = doc.data()['state'];
+      zip = doc.data()['zip'].toString();
+      custClass = doc.data()['custClass'];
+      distList = doc.data()['distList'];
+      fieldArea = doc.data()['fieldArea'];
+      poNum = doc.data()['poNum'];
+      requisitioner = doc.data()['requisitioner'];
+      taxRate = doc.data()['taxRate'] ?? 8.25;
+      ccFee = doc.data()['ccFee'];
 
-    return Customer(
-        custNum: custNum,
-        billingName: billingName,
-        primarySubmit: primarySubmit,
-        priceMap: priceMap,
-        add1: add1,
-        add2: add2,
-        add3: add3,
-        secondarySubmit: secondarySubmit,
-        city: city,
-        state: state,
-        zip: zip,
-        custClass: custClass,
-        distList: distList,
-        fieldArea: fieldArea,
-        poNum: poNum,
-        requisitioner: requisitioner,
-        taxRate: taxRate,
-        ccFee: ccFee);
+      return Customer(
+          custNum: custNum,
+          billingName: billingName,
+          primarySubmit: primarySubmit,
+          priceMap: priceMap,
+          add1: add1,
+          add2: add2,
+          add3: add3,
+          secondarySubmit: secondarySubmit,
+          city: city,
+          state: state,
+          zip: zip,
+          custClass: custClass,
+          distList: distList,
+          fieldArea: fieldArea,
+          poNum: poNum,
+          requisitioner: requisitioner,
+          taxRate: taxRate,
+          ccFee: ccFee);
+    } else
+      return null;
   }
 
   Future<Service> getService(String serviceCode) async {

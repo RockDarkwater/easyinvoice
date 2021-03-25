@@ -7,7 +7,7 @@ import 'package:get/get.dart';
 
 // Todo:
 
-// - Function to find customer number from name string
+// - Double-check import numbers
 
 // - ui to interact with customers, prices, items, and services.
 // - invoice template

@@ -15,23 +15,34 @@ class OverviewScreen extends StatelessWidget {
           future: controller.import(),
           builder: (context, snapshot) {
             if (snapshot.connectionState != ConnectionState.done) {
-              return Center(
-                child: Stack(alignment: Alignment.center, children: [
-                  SizedBox(
-                    height: 300,
-                    width: 300,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 20.0,
-                      backgroundColor: Colors.deepOrange,
+              return Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(25.0),
+                    child: Text(
+                      'Loading...',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(color: Colors.deepOrange, fontSize: 42),
                     ),
                   ),
-                  Text(
-                    'Loading...',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                        color: Colors.deepOrangeAccent[700], fontSize: 42),
-                  ),
-                ]),
+                  Obx(() => Stack(alignment: Alignment.center, children: [
+                        LinearProgressIndicator(
+                          minHeight: 25,
+                          value: (controller.currentProcess.value /
+                              controller.processQty.value),
+                          valueColor:
+                              AlwaysStoppedAnimation<Color>(Colors.deepOrange),
+                          backgroundColor: Colors.orange,
+                        ),
+                        Text(
+                          '${controller.currentProcess.value} / ${controller.processQty.value}',
+                          style: TextStyle(fontSize: 15, color: Colors.white),
+                          textAlign: TextAlign.center,
+                        ),
+                      ])),
+                ],
               );
             } else {
               return StreamBuilder(

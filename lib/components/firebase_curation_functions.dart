@@ -179,18 +179,18 @@ Future<void> uploadCustomers() async {
                 : primarySubmit = 'mail';
             billingDeets.contains('adp')
                 ? secondarySubmit = 'openinvoice'
-                : secondarySubmit ?? 'none';
+                : secondarySubmit ??= 'none';
             billingDeets.contains('ariba')
                 ? secondarySubmit = 'ariba'
-                : secondarySubmit ?? 'none';
+                : secondarySubmit ??= 'none';
           } else {
             billingDeets.contains('adp')
                 ? primarySubmit = 'openinvoice'
-                : primarySubmit ?? 'none';
+                : primarySubmit ??= 'none';
             billingDeets.contains('ariba')
                 ? primarySubmit = 'ariba'
-                : primarySubmit ?? 'none';
-            secondarySubmit ?? 'none';
+                : primarySubmit ??= 'none';
+            secondarySubmit ??= 'none';
           }
 
           if (rowMap[0] != 'ID') {

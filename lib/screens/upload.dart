@@ -38,7 +38,7 @@ class UploadScreen extends StatelessWidget {
                     onPressed: () async {
                       // await uploadCustomers();
                       // controller.jobs.add(await testJob());
-                      Get.to(OverviewScreen(),
+                      Get.to(() => OverviewScreen(),
                           transition: Transition.noTransition);
                       // await controller.import();
                     },
