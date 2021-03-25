@@ -158,9 +158,7 @@ class ImportController extends GetxController {
     print('starting AccuGas import.');
 
     //construction variables
-    Job job;
     String custNum;
-    StationCharge stationCharge;
     Service service;
 
     //job variables
@@ -175,11 +173,17 @@ class ImportController extends GetxController {
     String notes;
 
     processQty.value = data.maxRows;
+    print('looping ${data.maxRows} rows');
     //for each row after header, add service charge to job-> station charge -> item map
     for (int i = 2; i < data.maxRows; i++) {
       //get raw data
+
       currentProcess.value = i;
       custNum = data.cell(CellIndex.indexByString("C$i")).value.toString();
+      if (custNum == '305') {
+        //pause here
+        print('Sommat wrong');
+      }
       techName = data.cell(CellIndex.indexByString("BA$i")).value.toString();
       location = data.cell(CellIndex.indexByString("AX$i")).value.toString();
       jobDate = data.cell(CellIndex.indexByString("I$i")).value;
@@ -190,46 +194,45 @@ class ImportController extends GetxController {
       customer = await parseCustomer(custNum);
 
       //check if job exists for same customer, if not make it.
-      job = jobs.firstWhere((job) => job.customer.custNum == customer.custNum,
-          orElse: () {
-        Job newJob = Job(
-            customer: customer,
-            techName: techName,
-            location: location,
-            jobDate: jobDate,
-            stationCharges: [
-              StationCharge(
-                leaseName: leaseName,
-                leaseNumber: leaseNumber,
-                notes: notes,
-                serviceMap: {service: 1},
-                itemMap: {},
-              ),
-            ]);
-        jobs.add(newJob);
-        return newJob;
-      });
-
-      //check if station charge exists for job, if not, make it and then add it.
-      stationCharge = job.stationCharges.firstWhere(
-          (charge) => charge.leaseNumber == leaseNumber, orElse: () {
-        StationCharge newCharge = StationCharge(
-          leaseName: leaseName,
-          leaseNumber: leaseNumber,
-          notes: notes,
-          serviceMap: {service: 1},
-          itemMap: {},
-        );
-        job.stationCharges.add(newCharge);
-        return newCharge;
-      });
-
-      //check if station charge includes service, if not, make it.
-      if (stationCharge.serviceMap.containsKey(service)) {
-        stationCharge.serviceMap[service]++;
-      } else {
-        stationCharge.serviceMap[service] = 1;
-      }
+      jobs
+              .firstWhere((job) => job.customer.custNum == customer.custNum,
+                  orElse: () {
+                print('new job: ${customer.custNum}');
+                Job newJob = Job(
+                    customer: customer,
+                    techName: techName,
+                    location: location,
+                    jobDate: jobDate,
+                    stationCharges: []);
+                jobs.add(newJob);
+                return newJob;
+              })
+              .stationCharges
+              .firstWhere((charge) => charge.leaseNumber == leaseNumber,
+                  orElse: () {
+                // print('new station charge: $leaseNumber');
+                StationCharge newCharge = StationCharge(
+                  leaseName: leaseName,
+                  leaseNumber: leaseNumber,
+                  notes: notes,
+                  serviceMap: {service: 0},
+                  itemMap: {},
+                );
+                jobs
+                    .firstWhere(
+                        (job) => job.customer.custNum == customer.custNum)
+                    .stationCharges
+                    .add(newCharge);
+                return newCharge;
+              })
+              .serviceMap[
+          jobs
+              .firstWhere((job) => job.customer.custNum == customer.custNum)
+              .stationCharges
+              .firstWhere((charge) => charge.leaseNumber == leaseNumber)
+              .serviceMap
+              .keys
+              .firstWhere((key) => key.name == service.name)] += 1;
     }
     processQty.value = 1;
     currentProcess.value = 0;
@@ -432,15 +435,15 @@ class ImportController extends GetxController {
       // print('customer request is numeric: $customer');
       cust = await controller?.getCustomer('$customer');
       while (cust == null && testCust.substring(0, 1) == '0') {
-        print('couldn\'t find $testCust, removing zero');
+        // print('couldn\'t find $testCust, removing zero');
         testCust = testCust.substring(1, testCust.length);
-        print('getting $testCust');
+        // print('getting $testCust');
         cust = await controller?.getCustomer('$testCust');
       }
     }
 
     if (cust == null) {
-      print('searching string $customer');
+      // print('searching string $customer');
       // if non-numeric or multi-word, search each word and compile a list of potential customers
       searchVals =
           customer.toLowerCase().replaceAll(RegExp(r"[^\s\w]"), '').split(' ');
