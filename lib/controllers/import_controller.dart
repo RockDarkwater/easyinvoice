@@ -27,9 +27,11 @@ class ImportController extends GetxController {
     List<String> rows;
     Excel book;
 
+    print('imported ${result.files.length} files');
     importQty.value = result.files.length;
     //For each picked file, either add csv to txtDocs, or add excel to sheets
     for (int i = 0; i < result.files.length; i++) {
+      currentImport.value = i;
       if (result.files[i].name.contains('.txt')) {
         //import text files
         print('txt file');
@@ -56,10 +58,7 @@ class ImportController extends GetxController {
       } else {
         print('${result.files[i].name} is not text or excel');
       }
-      currentImport.value = i;
     }
-    currentImport.value = 0;
-    importQty.value = 1;
   }
 
   Future<void> buildAmisJobs(List<List<String>> data) async {
@@ -149,7 +148,7 @@ class ImportController extends GetxController {
         stationCharge.serviceMap[service] = quantity;
       }
     }
-    processQty.value = 0;
+    processQty.value = 1;
     currentProcess.value = 0;
     print('ending Amis import.');
   }
@@ -175,15 +174,11 @@ class ImportController extends GetxController {
     processQty.value = data.maxRows;
     print('looping ${data.maxRows} rows');
     //for each row after header, add service charge to job-> station charge -> item map
-    for (int i = 2; i < data.maxRows; i++) {
+    for (int i = 2; i <= data.maxRows; i++) {
       //get raw data
 
       currentProcess.value = i;
       custNum = data.cell(CellIndex.indexByString("C$i")).value.toString();
-      if (custNum == '305') {
-        //pause here
-        print('Sommat wrong');
-      }
       techName = data.cell(CellIndex.indexByString("BA$i")).value.toString();
       location = data.cell(CellIndex.indexByString("AX$i")).value.toString();
       jobDate = data.cell(CellIndex.indexByString("I$i")).value;

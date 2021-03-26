@@ -59,16 +59,16 @@ class FireBaseController extends GetxController {
           (element) =>
               element.toString().split('.')[1] == doc.data()['secondarySubmit'],
           orElse: () => SubmitOption.none);
-      city = doc.data()['city'];
-      state = doc.data()['state'];
-      zip = doc.data()['zip'].toString();
-      custClass = doc.data()['custClass'];
-      distList = doc.data()['distList'];
-      fieldArea = doc.data()['fieldArea'];
-      poNum = doc.data()['poNum'];
-      requisitioner = doc.data()['requisitioner'];
-      taxRate = doc.data()['taxRate'] ?? 8.25;
-      ccFee = doc.data()['ccFee'];
+      city = doc?.data()['city'];
+      state = doc?.data()['state'];
+      zip = doc?.data()['zip'].toString();
+      custClass = doc?.data()['custClass'] ?? '';
+      distList = doc?.data()['distList'] ?? '';
+      fieldArea = doc?.data()['fieldArea'] ?? '';
+      poNum = doc?.data()['poNum'].toString() ?? '';
+      requisitioner = doc?.data()['requisitioner'] ?? '';
+      taxRate = doc?.data()['taxRate'] ?? 8.25;
+      ccFee = doc?.data()['ccFee'] ?? false;
 
       return Customer(
           custNum: custNum,

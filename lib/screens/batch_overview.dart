@@ -15,34 +15,68 @@ class OverviewScreen extends StatelessWidget {
           future: controller.import(),
           builder: (context, snapshot) {
             if (snapshot.connectionState != ConnectionState.done) {
-              return Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.all(25.0),
-                    child: Text(
-                      'Loading...',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(color: Colors.deepOrange, fontSize: 42),
-                    ),
-                  ),
-                  Obx(() => Stack(alignment: Alignment.center, children: [
-                        LinearProgressIndicator(
-                          minHeight: 25,
-                          value: (controller.currentProcess.value /
-                              controller.processQty.value),
-                          valueColor:
-                              AlwaysStoppedAnimation<Color>(Colors.deepOrange),
-                          backgroundColor: Colors.orange,
-                        ),
-                        Text(
-                          '${controller.currentProcess.value} / ${controller.processQty.value}',
-                          style: TextStyle(fontSize: 15, color: Colors.white),
+              controller.importQty.value = 1;
+              controller.currentImport.value = 0;
+              controller.currentProcess.value = 0;
+              controller.processQty.value = 1;
+
+              return Center(
+                child: Container(
+                  height: MediaQuery.of(context).size.height / 2,
+                  width: MediaQuery.of(context).size.width / 3,
+                  color: Colors.orange[50],
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(25.0),
+                        child: Text(
+                          'Loading ...',
                           textAlign: TextAlign.center,
+                          style:
+                              TextStyle(color: Colors.deepOrange, fontSize: 42),
                         ),
-                      ])),
-                ],
+                      ),
+                      Stack(alignment: Alignment.center, children: [
+                        Obx(() => LinearProgressIndicator(
+                              minHeight: 25,
+                              value: (controller.currentProcess.value /
+                                  controller.processQty.value),
+                              valueColor: AlwaysStoppedAnimation<Color>(
+                                  Colors.deepOrange),
+                              backgroundColor: Colors.orange,
+                            )),
+                        Obx(() => Text(
+                              'Stations: ${controller.currentProcess.value} / ${controller.processQty.value}',
+                              style:
+                                  TextStyle(fontSize: 15, color: Colors.white),
+                              textAlign: TextAlign.center,
+                            )),
+                      ]),
+                      SizedBox(
+                        height: 5,
+                        width: 200,
+                      ),
+                      Stack(alignment: Alignment.center, children: [
+                        Obx(() => LinearProgressIndicator(
+                              minHeight: 25,
+                              value: (controller.currentImport.value /
+                                  controller.importQty.value),
+                              valueColor: AlwaysStoppedAnimation<Color>(
+                                  Colors.deepOrange),
+                              backgroundColor: Colors.orange,
+                            )),
+                        Obx(() => Text(
+                              'Imports: ${controller.currentImport.value} / ${controller.importQty.value}',
+                              style:
+                                  TextStyle(fontSize: 15, color: Colors.white),
+                              textAlign: TextAlign.center,
+                            )),
+                      ]),
+                    ],
+                  ),
+                ),
               );
             } else {
               return StreamBuilder(
