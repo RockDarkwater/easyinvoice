@@ -76,7 +76,7 @@ class ImportController extends GetxController {
     Customer customer;
     String techName;
     String location;
-    var jobDate;
+    String jobDate;
 
     //station charge variables
     String leaseName;
@@ -87,7 +87,7 @@ class ImportController extends GetxController {
     //for each row after header, add service charge to job-> station charge -> item map
     for (int i = 1; i < data.length; i++) {
       currentProcess.value = i;
-      // print('Row Customer: ${data[i][0]}');
+      print('Row Customer: ${data[i][0]}');
       if (customer?.custNum != data[i][0])
         customer = await parseCustomer(data[i][0]);
       //get raw data
@@ -105,7 +105,7 @@ class ImportController extends GetxController {
       //   - if not make it with the current line station charge.
       job = jobs.firstWhere((job) => job.customer.custNum == customer.custNum,
           orElse: () {
-        // print('new customer job: ${customer.billingName}');
+        print('new customer job: ${customer.billingName}');
         Job newJob = Job(
             customer: customer,
             techName: techName,
@@ -128,7 +128,7 @@ class ImportController extends GetxController {
       //  - if not, make it and then add the line charge.
       stationCharge = job.stationCharges
           .firstWhere((charge) => charge.leaseName == leaseName, orElse: () {
-        // print('new station charge job: $leaseName');
+        print('new station charge job: $leaseName');
         StationCharge newCharge = StationCharge(
           leaseName: leaseName,
           leaseNumber: leaseNumber,
@@ -154,7 +154,7 @@ class ImportController extends GetxController {
   }
 
   Future<void> buildAccugasJobs(Sheet data) async {
-    print('starting AccuGas import.');
+    // print('starting AccuGas import.');
 
     //construction variables
     String custNum;
@@ -164,7 +164,7 @@ class ImportController extends GetxController {
     Customer customer;
     String techName;
     String location;
-    var jobDate;
+    String jobDate;
 
     //station charge variables
     String leaseName;
@@ -172,7 +172,7 @@ class ImportController extends GetxController {
     String notes;
 
     processQty.value = data.maxRows;
-    print('looping ${data.maxRows} rows');
+    // print('looping ${data.maxRows} rows');
     //for each row after header, add service charge to job-> station charge -> item map
     for (int i = 2; i <= data.maxRows; i++) {
       //get raw data
@@ -181,7 +181,7 @@ class ImportController extends GetxController {
       custNum = data.cell(CellIndex.indexByString("C$i")).value.toString();
       techName = data.cell(CellIndex.indexByString("BA$i")).value.toString();
       location = data.cell(CellIndex.indexByString("AX$i")).value.toString();
-      jobDate = data.cell(CellIndex.indexByString("I$i")).value;
+      jobDate = data.cell(CellIndex.indexByString("I$i")).value.toString();
       leaseName = data.cell(CellIndex.indexByString("F$i")).value.toString();
       leaseNumber = data.cell(CellIndex.indexByString("D$i")).value.toString();
       notes = data.cell(CellIndex.indexByString("M$i")).value.toString();
@@ -192,7 +192,7 @@ class ImportController extends GetxController {
       jobs
               .firstWhere((job) => job.customer.custNum == customer.custNum,
                   orElse: () {
-                print('new job: ${customer.custNum}');
+                // print('new job: ${customer.custNum}');
                 Job newJob = Job(
                     customer: customer,
                     techName: techName,
@@ -231,12 +231,12 @@ class ImportController extends GetxController {
     }
     processQty.value = 1;
     currentProcess.value = 0;
-    print('ending Accugas import.');
+    // print('ending Accugas import.');
   }
 
   Future<void> buildWorkTicketJob(Sheet data) async {
     //set normal
-    print('starting WT import');
+    // print('starting WT import');
     FireBaseController flutterfire = Get.find();
     Customer customer = await parseCustomer(
         data.cell(CellIndex.indexByString('B2')).value.toString());
@@ -245,7 +245,7 @@ class ImportController extends GetxController {
     String requisitioner =
         data.cell(CellIndex.indexByString('K2')).value.toString();
     String location = data.cell(CellIndex.indexByString('K4')).value.toString();
-    var jobDate = data.cell(CellIndex.indexByString('B3')).value;
+    String jobDate = data.cell(CellIndex.indexByString('B3')).value.toString();
 
     List<StationCharge> stationCharges = [];
     List<dynamic> header = data.rows[10];
@@ -279,19 +279,22 @@ class ImportController extends GetxController {
             //get Item
             item = await flutterfire.getItem(code);
             itemMap[item] = double.tryParse(activeRow[j].toString()) ?? 0;
+            // print('item: ${item.name} added, x${itemMap[item]}');
           } else if (isService) {
             // get Service
             service =
                 await flutterfire.getService(translateServiceHeader(code));
             serviceMap[service] = double.tryParse(activeRow[j].toString()) ?? 0;
+
+            // print('service: ${service.name} added, x${serviceMap[service]}');
           }
 
-          print(
-              'chargeMap[${header[j].toString()}] = ${double.tryParse(activeRow[j].toString())}');
+          // print(
+          // 'chargeMap[${header[j].toString()}] = ${double.tryParse(activeRow[j].toString())}');
         }
         j++;
       }
-      print('creating charge...');
+      // print('creating charge...');
       stationCharges.add(StationCharge(
         leaseNumber: activeRow[0].toString(),
         leaseName: activeRow[1].toString(),
@@ -316,19 +319,13 @@ class ImportController extends GetxController {
   }
 
   Future<bool> checkExist(String collection, String docID) async {
-    bool exists = false;
     FireBaseController fireBaseController = Get.find();
 
-    try {
-      QuerySnapshot qry =
-          await fireBaseController.firebase.collection('$collection').get();
-      DocumentReference doc =
-          fireBaseController.firebase.doc('$collection/$docID');
-      exists = qry.docs.contains(doc);
-      return exists;
-    } catch (e) {
-      return false;
-    }
+    DocumentSnapshot ds = await fireBaseController.firebase
+        .collection('$collection')
+        .doc('$docID')
+        .get();
+    return ds.exists;
   }
 
   String translateServiceHeader(String header) {
@@ -450,7 +447,7 @@ class ImportController extends GetxController {
           ?.get();
       if (qry == null) print('could not find ${searchVals[0]}');
 
-      print('found ${qry.docs.length} documents ');
+      // print('found ${qry.docs.length} documents ');
 
       if (qry.docs.length > 1) {
         return await Get.dialog(
@@ -478,7 +475,7 @@ class ImportController extends GetxController {
                                   decoration: TextDecoration.none),
                             ),
                             onTap: () async {
-                              print(qry.docs[index].id);
+                              // print(qry.docs[index].id);
                               Get.back(
                                   result: await controller
                                       .getCustomer(qry.docs[index].id));

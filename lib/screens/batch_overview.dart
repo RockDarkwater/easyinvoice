@@ -1,9 +1,13 @@
 import 'package:easyinvoice/controllers/import_controller.dart';
+import 'package:easyinvoice/screens/invoice.dart';
+import 'package:easyinvoice/test/test_objects.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 
 class OverviewScreen extends StatelessWidget {
   final ImportController controller = Get.find();
+  final formatCurrency = NumberFormat.simpleCurrency();
 
   @override
   Widget build(BuildContext context) {
@@ -12,7 +16,7 @@ class OverviewScreen extends StatelessWidget {
         title: Text('EasyInvoice v0.0.1'),
       ),
       body: FutureBuilder(
-          future: controller.import(),
+          future: controller.import(), //testJob(),
           builder: (context, snapshot) {
             if (snapshot.connectionState != ConnectionState.done) {
               controller.importQty.value = 1;
@@ -94,18 +98,13 @@ class OverviewScreen extends StatelessWidget {
                             scrollDirection: Axis.vertical,
                             itemBuilder: (context, index) {
                               return ListTile(
-                                title: Text(
-                                    'C - ${controller.jobs[index].customer.custNum}: ${controller.jobs[index].customer.billingName}'),
-                                onTap: () async => Get.dialog(Container(
-                                    height: 200,
-                                    width: 400,
-                                    child: Center(
-                                      child: Text(
-                                          "charges for ${controller.jobs[index].stationCharges.length} stations",
-                                          style: TextStyle(
-                                              color: Colors.black,
-                                              decoration: TextDecoration.none)),
-                                    ))),
+                                title: Obx(() => Text(
+                                    'C - ${controller.jobs[index].customer.custNum}: ' +
+                                        '${controller.jobs[index].customer.billingName} - ' +
+                                        '${controller.jobs[index].countCharges()} items charged, Total: ' +
+                                        '${formatCurrency.format(controller.jobs[index].priceJob())}')),
+                                onTap: () async =>
+                                    Get.dialog(Invoice(controller.jobs[index])),
                                 focusColor: Colors.white54,
                                 leading: TextButton(
                                   onPressed: () {

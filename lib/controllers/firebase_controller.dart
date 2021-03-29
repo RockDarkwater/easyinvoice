@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easyinvoice/models/customer.dart';
 import 'package:easyinvoice/models/item.dart';
 import 'package:easyinvoice/models/service.dart';
+import 'package:easyinvoice/test/generic_price_map.dart';
 import 'package:get/get.dart';
 
 class FireBaseController extends GetxController {
@@ -28,6 +29,7 @@ class FireBaseController extends GetxController {
     SubmitOption primarySubmit;
     String billingName;
     Map<String, dynamic> priceMap;
+    Map<String, double> genericMap = genericPriceMap();
     String add1;
     String add2;
     String add3;
@@ -43,8 +45,12 @@ class FireBaseController extends GetxController {
     double taxRate;
     bool ccFee;
 
-    doc = await firebase.collection('customers')?.doc('$custNum')?.get();
     doc2 = await firebase.collection('servicePrices')?.doc('$custNum')?.get();
+    doc = await firebase.collection('customers')?.doc('$custNum')?.get();
+
+    for (var key in genericMap.keys) {
+      if (doc2?.data()[key] == null) doc2.data()[key] = genericMap[key];
+    }
 
     if (doc.data() != null) {
       primarySubmit = SubmitOption.values.firstWhere((element) =>
@@ -103,6 +109,10 @@ class FireBaseController extends GetxController {
     double workUnits = doc.data()['workUnits'];
 
     return Service(
-        name: name, qbName: qbName, category: category, workUnits: workUnits);
+        serviceCode: serviceCode,
+        name: name,
+        qbName: qbName,
+        category: category,
+        workUnits: workUnits);
   }
 }

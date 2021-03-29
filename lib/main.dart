@@ -7,8 +7,10 @@ import 'package:get/get.dart';
 
 // Todo:
 
-// - Double-check import numbers
-
+// - job splitting based on customer needs.
+// - import with generic price map if customer map is deficient (TEST)
+// - header with prompt for choosing customer dialog
+// - overview list shows total price, date span, total items, etc.
 // - ui to interact with customers, prices, items, and services.
 // - invoice template
 

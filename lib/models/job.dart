@@ -1,4 +1,6 @@
 import 'package:easyinvoice/models/customer.dart';
+import 'package:easyinvoice/models/item.dart';
+import 'package:easyinvoice/models/service.dart';
 import 'package:easyinvoice/models/station_charge.dart';
 
 class Job {
@@ -7,7 +9,7 @@ class Job {
   String poNumber;
   String requisitioner;
   String location;
-  var jobDate;
+  String jobDate;
   List<StationCharge> stationCharges = [];
 
   Job(
@@ -32,8 +34,33 @@ class Job {
           counter += charge.serviceMap[service].toDouble();
         }
       }
-      print('services + items: $counter');
+      // print('services + items: $counter');
     }
     return counter;
+  }
+
+  double priceJob() {
+    double price = 0;
+    double calc = 0;
+    for (StationCharge charge in stationCharges) {
+      if (charge?.itemMap != null && charge?.itemMap?.length != 0) {
+        for (Item item in charge.itemMap.keys) {
+          calc = item.price * charge?.itemMap[item];
+          price += calc;
+          // print('Item: \$$calc added to price');
+        }
+      }
+
+      if (charge?.serviceMap != null && charge?.serviceMap?.length != 0) {
+        for (Service service in charge.serviceMap.keys) {
+          calc = customer?.priceMap[service.serviceCode.toLowerCase()] *
+              charge.serviceMap[service];
+          // print('Service: \$$calc added to price');
+          price += calc;
+        }
+      }
+    }
+
+    return price;
   }
 }
