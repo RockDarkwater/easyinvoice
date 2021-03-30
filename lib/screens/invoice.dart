@@ -1,9 +1,9 @@
+import 'package:easyinvoice/components/invoice_parts/header.dart';
 import 'package:easyinvoice/controllers/import_controller.dart';
 import 'package:easyinvoice/models/job.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:intl/intl.dart';
 
 class Invoice extends StatelessWidget {
   final ImportController controller = Get.find();
@@ -14,8 +14,7 @@ class Invoice extends StatelessWidget {
   Widget build(BuildContext context) {
     return AlertDialog(
       scrollable: true,
-      title: Text(
-          'Invoice: ${job.customer.billingName} - ${DateFormat.MMMd().format(job.jobDate)}'),
+      title: InvoiceHeader(job),
       content: Container(
         height: 350,
         width: 750,

@@ -14,7 +14,7 @@ Future<void> testJob() async {
   Service gas = await controller.getGasService('Spot');
   Service liquid = await controller.getGasService('liquid');
   Item plate = await controllerF.getItem('MPU2-0002');
-  Customer cust = await controller.parseCustomer('BTA');
+  Customer cust = await controller.parseCustomer('8093');
 
   controller.jobs.add(Job(
     customer: cust,
