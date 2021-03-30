@@ -9,7 +9,7 @@ class Job {
   String poNumber;
   String requisitioner;
   String location;
-  String jobDate;
+  DateTime jobDate;
   List<StationCharge> stationCharges = [];
 
   Job(
@@ -34,8 +34,8 @@ class Job {
           counter += charge.serviceMap[service].toDouble();
         }
       }
-      // print('services + items: $counter');
     }
+    print('services + items: $counter');
     return counter;
   }
 

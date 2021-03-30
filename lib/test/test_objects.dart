@@ -18,7 +18,7 @@ Future<void> testJob() async {
 
   controller.jobs.add(Job(
     customer: cust,
-    jobDate: '1/1/2021',
+    jobDate: DateTime.tryParse('1/1/2021'),
     poNumber: 'PO#101020301',
     location: 'Your moms house',
     requisitioner: 'This guy',

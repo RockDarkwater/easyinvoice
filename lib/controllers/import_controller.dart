@@ -15,17 +15,21 @@ import 'package:get/get.dart';
 class ImportController extends GetxController {
   RxList<Job> jobs = <Job>[].obs;
   RxInt importQty = 1.obs;
-  RxInt currentImport = 0.obs;
+  RxInt currentImport = 1.obs;
   RxInt processQty = 1.obs;
-  RxInt currentProcess = 0.obs;
+  RxInt currentProcess = 1.obs;
+  RxList<String> resultNames = <String>[''].obs;
 
   Future<void> import() async {
     print('starting import.');
     FilePickerResult result =
         await FilePicker.platform.pickFiles(allowMultiple: true);
+
+    resultNames.insertAll(0, result.names);
     List<List<String>> txtFile;
     List<String> rows;
     Excel book;
+    String date;
 
     print('imported ${result.files.length} files');
     importQty.value = result.files.length;
@@ -40,8 +44,10 @@ class ImportController extends GetxController {
         txtFile = List.generate(rows.length, (index) {
           return rows[index].split('\t');
         });
-
-        await buildAmisJobs(txtFile);
+        date = result.files[i].name;
+        date = date.substring(date.indexOf('_') + 1, date.indexOf('.'));
+        print(date);
+        await buildAmisJobs(txtFile, date);
       } else if (result.files[i].name.contains('.xls')) {
         //import excel files
         print(
@@ -61,7 +67,7 @@ class ImportController extends GetxController {
     }
   }
 
-  Future<void> buildAmisJobs(List<List<String>> data) async {
+  Future<void> buildAmisJobs(List<List<String>> data, String date) async {
     print('starting Amis import.');
 
     //construction variables
@@ -76,7 +82,7 @@ class ImportController extends GetxController {
     Customer customer;
     String techName;
     String location;
-    String jobDate;
+    DateTime jobDate;
 
     //station charge variables
     String leaseName;
@@ -87,15 +93,17 @@ class ImportController extends GetxController {
     //for each row after header, add service charge to job-> station charge -> item map
     for (int i = 1; i < data.length; i++) {
       currentProcess.value = i;
-      print('Row Customer: ${data[i][0]}');
-      if (customer?.custNum != data[i][0])
+      // print('Row Customer: ${data[i][0]}');
+      if (customer?.custNum != data[i][0].toString()) {
         customer = await parseCustomer(data[i][0]);
+      }
       //get raw data
       techName = 'amis';
       location = data[i][17];
       leaseName = data[i][5];
       leaseNumber = data[i][4];
       notes = data[i][6];
+      jobDate = DateTime.tryParse(date.replaceAll('_', '-'));
       cycle = int.tryParse(data[i][7]) ?? 0;
       orifice = !notes.contains('EGM');
       quantity = double.tryParse(data[i][11]) ?? 0;
@@ -128,7 +136,7 @@ class ImportController extends GetxController {
       //  - if not, make it and then add the line charge.
       stationCharge = job.stationCharges
           .firstWhere((charge) => charge.leaseName == leaseName, orElse: () {
-        print('new station charge job: $leaseName');
+        // print('new station charge job: $leaseName');
         StationCharge newCharge = StationCharge(
           leaseName: leaseName,
           leaseNumber: leaseNumber,
@@ -154,7 +162,7 @@ class ImportController extends GetxController {
   }
 
   Future<void> buildAccugasJobs(Sheet data) async {
-    // print('starting AccuGas import.');
+    print('starting AccuGas import.');
 
     //construction variables
     String custNum;
@@ -164,7 +172,7 @@ class ImportController extends GetxController {
     Customer customer;
     String techName;
     String location;
-    String jobDate;
+    DateTime jobDate;
 
     //station charge variables
     String leaseName;
@@ -172,7 +180,7 @@ class ImportController extends GetxController {
     String notes;
 
     processQty.value = data.maxRows;
-    // print('looping ${data.maxRows} rows');
+    print('looping ${data.maxRows} rows');
     //for each row after header, add service charge to job-> station charge -> item map
     for (int i = 2; i <= data.maxRows; i++) {
       //get raw data
@@ -181,7 +189,8 @@ class ImportController extends GetxController {
       custNum = data.cell(CellIndex.indexByString("C$i")).value.toString();
       techName = data.cell(CellIndex.indexByString("BA$i")).value.toString();
       location = data.cell(CellIndex.indexByString("AX$i")).value.toString();
-      jobDate = data.cell(CellIndex.indexByString("I$i")).value.toString();
+      jobDate = DateTime.tryParse(
+          data.cell(CellIndex.indexByString("I$i")).value.toString());
       leaseName = data.cell(CellIndex.indexByString("F$i")).value.toString();
       leaseNumber = data.cell(CellIndex.indexByString("D$i")).value.toString();
       notes = data.cell(CellIndex.indexByString("M$i")).value.toString();
@@ -192,7 +201,7 @@ class ImportController extends GetxController {
       jobs
               .firstWhere((job) => job.customer.custNum == customer.custNum,
                   orElse: () {
-                // print('new job: ${customer.custNum}');
+                print('new job: ${customer.custNum}');
                 Job newJob = Job(
                     customer: customer,
                     techName: techName,
@@ -231,12 +240,12 @@ class ImportController extends GetxController {
     }
     processQty.value = 1;
     currentProcess.value = 0;
-    // print('ending Accugas import.');
+    print('ending Accugas import.');
   }
 
   Future<void> buildWorkTicketJob(Sheet data) async {
     //set normal
-    // print('starting WT import');
+    print('starting WT import');
     FireBaseController flutterfire = Get.find();
     Customer customer = await parseCustomer(
         data.cell(CellIndex.indexByString('B2')).value.toString());
@@ -245,7 +254,8 @@ class ImportController extends GetxController {
     String requisitioner =
         data.cell(CellIndex.indexByString('K2')).value.toString();
     String location = data.cell(CellIndex.indexByString('K4')).value.toString();
-    String jobDate = data.cell(CellIndex.indexByString('B3')).value.toString();
+    DateTime jobDate = DateTime.tryParse(
+        data.cell(CellIndex.indexByString('B3')).value.toString());
 
     List<StationCharge> stationCharges = [];
     List<dynamic> header = data.rows[10];
@@ -289,12 +299,12 @@ class ImportController extends GetxController {
             // print('service: ${service.name} added, x${serviceMap[service]}');
           }
 
-          // print(
-          // 'chargeMap[${header[j].toString()}] = ${double.tryParse(activeRow[j].toString())}');
+          print(
+              'chargeMap[${header[j].toString()}] = ${double.tryParse(activeRow[j].toString())}');
         }
         j++;
       }
-      // print('creating charge...');
+      print('creating charge...');
       stationCharges.add(StationCharge(
         leaseNumber: activeRow[0].toString(),
         leaseName: activeRow[1].toString(),
@@ -419,10 +429,13 @@ class ImportController extends GetxController {
     Customer cust;
     QuerySnapshot qry;
     List<String> searchVals;
+    String testNum;
 
     // if customer given is primarily numeric and only one word, assume customer number and build
-    if (int.tryParse(customer.substring(0, 2)) != null &&
-        customer.split(' ').length == 1) {
+    (customer.length > 1)
+        ? testNum = customer.substring(0, 2)
+        : testNum = customer;
+    if (int.tryParse(testNum) != null && customer.split(' ').length == 1) {
       String testCust = customer.toString();
       // print('customer request is numeric: $customer');
       cust = await controller?.getCustomer('$customer');

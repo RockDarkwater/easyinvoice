@@ -29,7 +29,7 @@ class FireBaseController extends GetxController {
     SubmitOption primarySubmit;
     String billingName;
     Map<String, dynamic> priceMap;
-    Map<String, double> genericMap = genericPriceMap();
+    Map<String, dynamic> genericMap = genericPriceMap();
     String add1;
     String add2;
     String add3;
@@ -45,19 +45,20 @@ class FireBaseController extends GetxController {
     double taxRate;
     bool ccFee;
 
+    // print('searching for $custNum');
     doc2 = await firebase.collection('servicePrices')?.doc('$custNum')?.get();
     doc = await firebase.collection('customers')?.doc('$custNum')?.get();
+    if (!doc2.exists) priceMap = Map.from(genericMap);
 
-    for (var key in genericMap.keys) {
-      if (doc2?.data()[key] == null) doc2.data()[key] = genericMap[key];
-    }
-
-    if (doc.data() != null) {
+    if (doc.exists) {
       primarySubmit = SubmitOption.values.firstWhere((element) =>
           element.toString().split('.')[1] ==
           doc.data()['primarySubmit'].toString());
       billingName = doc.data()['billingName'];
-      priceMap = doc2.data();
+      priceMap ??= Map.from(doc2.data());
+      for (var key in genericMap.keys) {
+        if (!priceMap.keys.contains(key)) priceMap[key] = genericMap[key];
+      }
       add1 = doc.data()['add1'];
       add2 = doc.data()['add2'];
       add3 = doc.data()['add3'];

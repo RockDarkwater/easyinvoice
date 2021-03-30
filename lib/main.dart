@@ -8,7 +8,8 @@ import 'package:get/get.dart';
 // Todo:
 
 // - job splitting based on customer needs.
-// - import with generic price map if customer map is deficient (TEST)
+// - test import charge counting.
+// - create 'add customer' dialog when parsing customer
 // - header with prompt for choosing customer dialog
 // - overview list shows total price, date span, total items, etc.
 // - ui to interact with customers, prices, items, and services.

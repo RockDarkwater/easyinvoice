@@ -35,11 +35,26 @@ class OverviewScreen extends StatelessWidget {
                     children: [
                       Padding(
                         padding: const EdgeInsets.all(25.0),
-                        child: Text(
-                          'Loading ...',
-                          textAlign: TextAlign.center,
-                          style:
-                              TextStyle(color: Colors.deepOrange, fontSize: 42),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.only(bottom: 5.0),
+                              child: Text(
+                                'Loading ...',
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                    color: Colors.deepOrange, fontSize: 42),
+                              ),
+                            ),
+                            Obx(() => Text(
+                                  '${controller.resultNames[controller.currentImport.value]}',
+                                  textAlign: TextAlign.center,
+                                  softWrap: true,
+                                  style: TextStyle(
+                                      color: Colors.deepOrange, fontSize: 14),
+                                )),
+                          ],
                         ),
                       ),
                       Stack(alignment: Alignment.center, children: [

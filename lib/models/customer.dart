@@ -2,7 +2,7 @@ class Customer {
   final String custNum;
   final SubmitOption primarySubmit;
   final String billingName;
-  final Map<String, double> priceMap;
+  final Map<String, dynamic> priceMap;
 
   String add1;
   String add2;
