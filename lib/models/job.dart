@@ -35,7 +35,7 @@ class Job {
         }
       }
     }
-    print('services + items: $counter');
+    // print('services + items: $counter');
     return counter;
   }
 

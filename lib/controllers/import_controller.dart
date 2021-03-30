@@ -201,7 +201,7 @@ class ImportController extends GetxController {
       jobs
               .firstWhere((job) => job.customer.custNum == customer.custNum,
                   orElse: () {
-                print('new job: ${customer.custNum}');
+                // print('new job: ${customer.custNum}');
                 Job newJob = Job(
                     customer: customer,
                     techName: techName,
@@ -299,8 +299,8 @@ class ImportController extends GetxController {
             // print('service: ${service.name} added, x${serviceMap[service]}');
           }
 
-          print(
-              'chargeMap[${header[j].toString()}] = ${double.tryParse(activeRow[j].toString())}');
+          // print(
+          //     'chargeMap[${header[j].toString()}] = ${double.tryParse(activeRow[j].toString())}');
         }
         j++;
       }
@@ -500,6 +500,7 @@ class ImportController extends GetxController {
                 ],
               ),
             ),
+            scrollable: true,
           ),
           barrierColor: Colors.white70,
         );
