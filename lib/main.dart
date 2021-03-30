@@ -11,7 +11,6 @@ import 'package:get/get.dart';
 // - test import charge counting.
 // - create 'add customer' dialog when parsing customer
 // - header with prompt for choosing customer dialog
-// - overview list shows total price, date span, total items, etc.
 // - ui to interact with customers, prices, items, and services.
 // - invoice template
 

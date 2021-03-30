@@ -118,13 +118,22 @@ class OverviewScreen extends StatelessWidget {
                                         '${controller.jobs[index].customer.billingName} - ' +
                                         '${controller.jobs[index].countCharges()} items charged, Total: ' +
                                         '${formatCurrency.format(controller.jobs[index].priceJob())}')),
-                                onTap: () async =>
-                                    Get.dialog(Invoice(controller.jobs[index])),
+                                onTap: () async => await Get.dialog(
+                                    Invoice(controller.jobs[index])),
                                 focusColor: Colors.white54,
                                 leading: TextButton(
                                   onPressed: () {
                                     controller.jobs.removeAt(index);
-                                    if (controller.jobs.length == 0) Get.back();
+                                    if (controller.jobs.length == 0) {
+                                      Get.back();
+                                      controller.currentImport.value = 1;
+                                      controller.importQty.value = 1;
+                                      controller.processQty.value = 1;
+                                      controller.currentProcess.value = 1;
+                                      controller.resultNames.clear();
+                                      controller.resultNames.add('');
+                                    }
+                                    ;
                                   },
                                   child: Icon(Icons.remove),
                                 ),

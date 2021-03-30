@@ -13,9 +13,32 @@ class Invoice extends StatelessWidget {
 
   Widget build(BuildContext context) {
     return AlertDialog(
+      scrollable: true,
       title: Text(
           'Invoice: ${job.customer.billingName} - ${DateFormat.MMMd().format(job.jobDate)}'),
-      content: Text('Job is a job.'),
+      content: Container(
+        height: 350,
+        width: 750,
+        child: ListView.builder(
+            physics: ClampingScrollPhysics(),
+            shrinkWrap: true,
+            itemCount: job.stationCharges.length,
+            itemBuilder: (context, index) {
+              return ListTile(
+                  title: Text(
+                      'Station ${job.stationCharges[index].leaseName} - services:'),
+                  subtitle: ListView.builder(
+                      itemCount: job.stationCharges[index].serviceMap.length,
+                      physics: NeverScrollableScrollPhysics(),
+                      shrinkWrap: true,
+                      itemBuilder: (context, ind) {
+                        return ListTile(
+                            title: Text(
+                                '${job.stationCharges[index].serviceMap.keys.toList()[ind].name} - ' +
+                                    '${job.stationCharges[index].serviceMap[job.stationCharges[index].serviceMap.keys.toList()[ind]]}'));
+                      }));
+            }),
+      ),
       actions: [
         TextButton(onPressed: () => Get.back(), child: Icon(Icons.arrow_left))
       ],
