@@ -132,7 +132,6 @@ class OverviewScreen extends StatelessWidget {
                                       controller.resultNames.clear();
                                       controller.resultNames.add('');
                                     }
-                                    ;
                                   },
                                   child: Icon(Icons.remove),
                                 ),
