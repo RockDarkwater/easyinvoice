@@ -16,7 +16,7 @@ class OverviewScreen extends StatelessWidget {
         title: Text('EasyInvoice v0.0.1'),
       ),
       body: FutureBuilder(
-          future: testJob(), //controller.import(),
+          future: controller.import(), //testJob(),
           builder: (context, snapshot) {
             if (snapshot.connectionState != ConnectionState.done) {
               controller.importQty.value = 1;

@@ -61,7 +61,7 @@ class SubHeader extends StatelessWidget {
                   Text('${DateFormat.yMd().format(DateTime.now())}'),
                   Text('Net 30'),
                   Text('${job.customer.custNum ?? ''}'),
-                  Text('${job.customer.poNum ?? ''}'),
+                  Text('${job.poNumber ?? job.customer.poNum ?? ''}'),
                   Text('${job.techName ?? ''}'),
                   Text('${job.location ?? ''}'),
                 ],

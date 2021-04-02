@@ -246,14 +246,20 @@ class ImportController extends GetxController {
   Future<void> buildWorkTicketJob(Sheet data) async {
     //set normal
     print('starting WT import');
+    int totalRows = 11;
+    while (data.rows[totalRows][1].toString() != "Instance of Formula" &&
+        data.rows[totalRows][1] != null &&
+        data.rows[totalRows][1].toString().trim() != '') totalRows++;
+    processQty.value = totalRows - 11;
+
     FireBaseController flutterfire = Get.find();
     Customer customer = await parseCustomer(
         data.cell(CellIndex.indexByString('B2')).value.toString());
-    String techName = data.cell(CellIndex.indexByString('B4')).value.toString();
-    String poNumber = data.cell(CellIndex.indexByString('K3')).value.toString();
+    String techName = data.cell(CellIndex.indexByString('B4')).value;
+    String poNumber = data.cell(CellIndex.indexByString('K3')).value;
     String requisitioner =
         data.cell(CellIndex.indexByString('K2')).value.toString();
-    String location = data.cell(CellIndex.indexByString('K4')).value.toString();
+    String location = data.cell(CellIndex.indexByString('K4')).value;
     DateTime jobDate = DateTime.tryParse(
         data.cell(CellIndex.indexByString('B3')).value.toString());
 
@@ -274,6 +280,7 @@ class ImportController extends GetxController {
         data.rows[i][1] != null &&
         data.rows[i][1].toString().trim() != '') {
       // print('lease:${data.rows[i][1].toString()}.');
+      currentProcess.value = i - 11;
       activeRow = data.rows[i];
       while (header[j] != null) {
         // print('header: ${header[j].toString()}');
@@ -304,7 +311,7 @@ class ImportController extends GetxController {
         }
         j++;
       }
-      print('creating charge...');
+      // print('creating charge...');
       stationCharges.add(StationCharge(
         leaseNumber: activeRow[0].toString(),
         leaseName: activeRow[1].toString(),
