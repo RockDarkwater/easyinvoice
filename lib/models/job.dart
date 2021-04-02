@@ -21,6 +21,42 @@ class Job {
       this.jobDate,
       this.stationCharges});
 
+  String jobSummary() {
+    String string = '';
+
+    if (stationCharges
+            .where((charge) =>
+                charge.serviceMap.keys
+                    .where((service) => service.category == "Field Work")
+                    .length >
+                0)
+            .length >
+        0) string = '$string/Field Work';
+
+    if (stationCharges
+            .where((charge) =>
+                charge.serviceMap.keys
+                    .where((service) => service.category == "Analysis")
+                    .length >
+                0)
+            .length >
+        0) string = '$string/Analysis';
+
+    if (stationCharges
+            .where((charge) =>
+                charge.serviceMap.keys
+                    .where((service) => service.category == "Volumes")
+                    .length >
+                0)
+            .length >
+        0) string = '$string/Volumes';
+
+    if (stationCharges.where((charge) => charge.itemMap.length > 0).length > 0)
+      string = '$string/Resale';
+
+    return string.substring(1);
+  }
+
   double countCharges() {
     double counter = 0;
     for (var charge in stationCharges) {
