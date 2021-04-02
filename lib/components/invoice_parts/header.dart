@@ -12,13 +12,15 @@ class InvoiceHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Size screen = MediaQuery.of(context).size;
-    Image logo = Image(image: howard, height: screen.height / 7);
+    double invWidth = screen.width * 8.5 / 11;
+    Image logo = Image(image: howard, width: invWidth * 2 / 5);
     return Container(
-      width: screen.height * 8.5 / 11,
-      color: Colors.orangeAccent[100],
+      constraints: BoxConstraints.tightFor(
+        width: invWidth,
+      ),
+      color: Colors.orange[50],
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
-        mainAxisSize: MainAxisSize.min,
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -33,7 +35,7 @@ class InvoiceHeader extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   SizedBox(
-                    height: logo.height * .4,
+                    height: logo.width * .2,
                   ),
                   Text(
                     'Remit To:',
