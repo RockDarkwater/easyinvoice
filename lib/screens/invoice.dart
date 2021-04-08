@@ -1,6 +1,8 @@
 import 'package:easyinvoice/components/invoice_parts/header.dart';
 import 'package:easyinvoice/components/invoice_parts/sub_header.dart';
+import 'package:easyinvoice/components/invoice_parts/summary.dart';
 import 'package:easyinvoice/controllers/import_controller.dart';
+import 'package:easyinvoice/controllers/ui_controller.dart';
 import 'package:easyinvoice/models/job.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -8,23 +10,51 @@ import 'package:get/get.dart';
 
 class Invoice extends StatelessWidget {
   final ImportController controller = Get.find();
+  final UIController uiController = Get.find();
   final Job job;
 
   Invoice(this.job);
 
   Widget build(BuildContext context) {
-    return AlertDialog(
-      scrollable: true,
-      title: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+    return Container(
+      child: Stack(
         children: [
-          InvoiceHeader(job),
-          SubHeader(job),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Expanded(
+                  child: GestureDetector(
+                onTap: () {
+                  print('tapped left');
+                  uiController.invView.value = false;
+                },
+                child: Container(
+                  decoration: BoxDecoration(color: Colors.orange[200]),
+                ),
+              )),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  InvoiceHeader(job),
+                  SubHeader(job),
+                  InvoiceSummary(job),
+                ],
+              ),
+              Expanded(
+                  child: GestureDetector(
+                onTap: () {
+                  print('tapped left');
+                  uiController.invView.value = false;
+                },
+                child: Container(
+                  decoration: BoxDecoration(color: Colors.orange[200]),
+                ),
+              )),
+            ],
+          ),
         ],
       ),
-      actions: [
-        TextButton(onPressed: () => Get.back(), child: Icon(Icons.arrow_left))
-      ],
+      // TextButton(onPressed: () => Get.back(), child: Icon(Icons.arrow_left))
     );
   }
 }

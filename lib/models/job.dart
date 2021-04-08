@@ -11,6 +11,7 @@ class Job {
   String location;
   DateTime jobDate;
   List<StationCharge> stationCharges = [];
+  Map<String, double> chargeSummary = Map();
 
   Job(
       {this.customer,
@@ -19,7 +20,8 @@ class Job {
       this.requisitioner,
       this.location,
       this.jobDate,
-      this.stationCharges});
+      this.stationCharges,
+      this.chargeSummary});
 
   String jobSummary() {
     String string = '';

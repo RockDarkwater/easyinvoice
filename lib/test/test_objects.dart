@@ -17,31 +17,35 @@ Future<void> testJob() async {
   Customer cust = await controller.parseCustomer('8093');
 
   controller.jobs.add(Job(
-    customer: cust,
-    jobDate: DateTime(2021, 4, 1),
-    poNumber: 'PO#101020301',
-    location: 'Your moms house',
-    requisitioner: 'This guy',
-    techName: 'Johnny Horton',
-    stationCharges: [
-      StationCharge(
-          leaseName: 'Test Lease 1',
-          leaseNumber: '12345',
+      customer: cust,
+      jobDate: DateTime(2021, 4, 1),
+      poNumber: 'PO#101020301',
+      location: 'Your moms house',
+      requisitioner: 'This guy',
+      techName: 'Johnny Horton',
+      stationCharges: [
+        StationCharge(
+            leaseName: 'Test Lease 1',
+            leaseNumber: '12345',
+            serviceMap: {
+              gas: 1,
+              liquid: 6,
+            },
+            itemMap: {
+              plate: 2
+            }),
+        StationCharge(
+          leaseName: 'Test Lease 2',
+          leaseNumber: '23456',
           serviceMap: {
-            gas: 1,
-            liquid: 6,
+            gas: 3,
           },
-          itemMap: {
-            plate: 2
-          }),
-      StationCharge(
-        leaseName: 'Test Lease 2',
-        leaseNumber: '23456',
-        serviceMap: {
-          gas: 3,
-        },
-        itemMap: {},
-      ),
-    ],
-  ));
+          itemMap: {},
+        ),
+      ],
+      chargeSummary: {
+        gas.name: 4,
+        liquid.name: 6,
+        plate.name: 2,
+      }));
 }

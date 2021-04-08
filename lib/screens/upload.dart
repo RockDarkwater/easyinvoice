@@ -1,4 +1,5 @@
 import 'package:easyinvoice/controllers/import_controller.dart';
+import 'package:easyinvoice/controllers/ui_controller.dart';
 import 'package:easyinvoice/screens/batch_overview.dart';
 
 import 'package:flutter/material.dart';
@@ -6,9 +7,11 @@ import 'package:get/get.dart';
 
 class UploadScreen extends StatelessWidget {
   final ImportController controller = Get.find();
+  final UIController uiController = Get.find();
 
   @override
   Widget build(BuildContext context) {
+    uiController.setSizes(context);
     return Scaffold(
       appBar: AppBar(
         title: Text('EasyInvoice v0.0.1'),

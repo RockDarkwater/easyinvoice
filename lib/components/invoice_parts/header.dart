@@ -1,7 +1,10 @@
+import 'package:easyinvoice/controllers/ui_controller.dart';
 import 'package:easyinvoice/models/job.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 class InvoiceHeader extends StatelessWidget {
+  final UIController uiController = Get.find();
   final AssetImage howard = AssetImage('assets/logo.png');
   final Job job;
   final TextStyle remitStyle =
@@ -11,12 +14,11 @@ class InvoiceHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Size screen = MediaQuery.of(context).size;
-    double invWidth = screen.width * 8.5 / 11;
-    Image logo = Image(image: howard, width: invWidth * 2 / 5);
+    Image logo =
+        Image(image: howard, width: uiController.invWidth.value * 2 / 5);
     return Container(
       constraints: BoxConstraints.tightFor(
-        width: invWidth,
+        width: uiController.invWidth.value,
       ),
       color: Colors.orange[50],
       child: Column(
@@ -27,7 +29,7 @@ class InvoiceHeader extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Padding(
-                padding: const EdgeInsets.all(12.0),
+                padding: const EdgeInsets.only(top: 12.0, left: 12.0),
                 child: logo,
               ),
               Column(
@@ -60,7 +62,7 @@ class InvoiceHeader extends StatelessWidget {
                 ],
               ),
               Padding(
-                padding: const EdgeInsets.all(12.0),
+                padding: const EdgeInsets.only(top: 15.0, right: 20.0),
                 child: Text(
                   'Page 1 of 1',
                   textAlign: TextAlign.left,

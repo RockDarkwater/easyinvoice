@@ -1,5 +1,6 @@
 import 'package:easyinvoice/controllers/firebase_controller.dart';
 import 'package:easyinvoice/controllers/import_controller.dart';
+import 'package:easyinvoice/controllers/ui_controller.dart';
 import 'package:easyinvoice/screens/upload.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -23,6 +24,7 @@ void main() {
   WidgetsFlutterBinding.ensureInitialized();
   Get.put(FireBaseController());
   Get.put(ImportController());
+  Get.put(UIController());
   runApp(App());
 }
 
@@ -30,6 +32,7 @@ class App extends StatelessWidget {
   // Create the firebase initialization Future outside of `build`:
   final Future<FirebaseApp> _initialization = Firebase.initializeApp();
   final ImportController controller = Get.find();
+  final UIController uiController = Get.find();
 
   @override
   Widget build(BuildContext context) {

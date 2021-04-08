@@ -255,17 +255,18 @@ class ImportController extends GetxController {
     FireBaseController flutterfire = Get.find();
     Customer customer = await parseCustomer(
         data.cell(CellIndex.indexByString('B2')).value.toString());
-    String techName = data.cell(CellIndex.indexByString('B4')).value;
-    String poNumber = data.cell(CellIndex.indexByString('K3')).value;
+    String techName = data.cell(CellIndex.indexByString('B4')).value.toString();
+    String poNumber = data.cell(CellIndex.indexByString('K3')).value.toString();
     String requisitioner =
         data.cell(CellIndex.indexByString('K2')).value.toString();
-    String location = data.cell(CellIndex.indexByString('K4')).value;
+    String location = data.cell(CellIndex.indexByString('K4')).value.toString();
     DateTime jobDate = DateTime.tryParse(
         data.cell(CellIndex.indexByString('B3')).value.toString());
 
     List<StationCharge> stationCharges = [];
     List<dynamic> header = data.rows[10];
     List<dynamic> activeRow;
+    Map<String, double> summaryMap = Map();
     Map<Service, double> serviceMap = Map();
     Map<Item, double> itemMap = Map();
     String code;
@@ -296,14 +297,23 @@ class ImportController extends GetxController {
             //get Item
             item = await flutterfire.getItem(code);
             itemMap[item] = double.tryParse(activeRow[j].toString()) ?? 0;
+
+            //add item to summary map
+            (summaryMap.containsKey(item.name))
+                ? summaryMap[item.name] += itemMap[item]
+                : summaryMap[item.name] = itemMap[item];
             // print('item: ${item.name} added, x${itemMap[item]}');
           } else if (isService) {
             // get Service
             service =
                 await flutterfire.getService(translateServiceHeader(code));
             serviceMap[service] = double.tryParse(activeRow[j].toString()) ?? 0;
+            // add service to summary map
 
-            // print('service: ${service.name} added, x${serviceMap[service]}');
+            //add item to summary map
+            (summaryMap.containsKey(service.name))
+                ? summaryMap[service.name] += serviceMap[service]
+                : summaryMap[service.name] = serviceMap[service];
           }
 
           // print(
@@ -332,6 +342,7 @@ class ImportController extends GetxController {
       location: location,
       jobDate: jobDate,
       stationCharges: stationCharges,
+      chargeSummary: summaryMap,
     ));
   }
 
@@ -485,7 +496,6 @@ class ImportController extends GetxController {
                   Flexible(
                     child: ListView.builder(
                         itemCount: qry.docs.length,
-                        scrollDirection: Axis.vertical,
                         itemBuilder: (context, index) {
                           return ListTile(
                             title: Text(
