@@ -13,13 +13,14 @@ Future<void> testJob() async {
 
   Service gas = await controller.getGasService('Spot');
   Service liquid = await controller.getGasService('liquid');
+  Service cal = await controllerF.getService('calibration');
   Item plate = await controllerF.getItem('MPU2-0002');
   Customer cust = await controller.parseCustomer('8093');
 
   controller.jobs.add(Job(
       customer: cust,
       jobDate: DateTime(2021, 4, 1),
-      poNumber: 'PO#101020301',
+      poNumber: '101020301',
       location: 'Your moms house',
       requisitioner: 'This guy',
       techName: 'Johnny Horton',
@@ -28,6 +29,7 @@ Future<void> testJob() async {
             leaseName: 'Test Lease 1',
             leaseNumber: '12345',
             serviceMap: {
+              cal: 1,
               gas: 1,
               liquid: 6,
             },
@@ -38,14 +40,17 @@ Future<void> testJob() async {
           leaseName: 'Test Lease 2',
           leaseNumber: '23456',
           serviceMap: {
+            cal: 1,
             gas: 3,
           },
           itemMap: {},
         ),
       ],
       chargeSummary: {
-        gas.name: 4,
-        liquid.name: 6,
-        plate.name: 2,
+        cal: 2,
+        gas: 4,
+        liquid: 6,
+        plate: 2
       }));
+  controller.jobs.last.priceServices();
 }

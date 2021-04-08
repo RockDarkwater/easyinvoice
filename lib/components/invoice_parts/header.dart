@@ -20,7 +20,6 @@ class InvoiceHeader extends StatelessWidget {
       constraints: BoxConstraints.tightFor(
         width: uiController.invWidth.value,
       ),
-      color: Colors.orange[50],
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [

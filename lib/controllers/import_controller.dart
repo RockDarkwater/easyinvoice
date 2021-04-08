@@ -65,6 +65,9 @@ class ImportController extends GetxController {
         print('${result.files[i].name} is not text or excel');
       }
     }
+    jobs.forEach((job) {
+      job.priceServices();
+    });
   }
 
   Future<void> buildAmisJobs(List<List<String>> data, String date) async {

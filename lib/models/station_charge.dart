@@ -1,8 +1,6 @@
 import 'package:easyinvoice/models/item.dart';
 import 'package:easyinvoice/models/service.dart';
 
-import 'customer.dart';
-
 class StationCharge {
   String leaseName;
   String leaseNumber;
@@ -18,14 +16,15 @@ class StationCharge {
       this.serviceMap,
       this.itemMap});
 
-  priceStation(Customer customer) {
-    serviceMap.forEach((key, value) {
-      stationPricing[key.serviceCode] =
-          customer.priceMap[key.serviceCode] * value;
+  double taxableAmount() {
+    double taxable = 0;
+    itemMap.forEach((key, value) {
+      if (key.taxable) taxable += (value * key.price);
     });
 
-    itemMap.forEach((key, value) {
-      stationPricing[key.itemCode] = key.price * value;
+    serviceMap.forEach((key, value) {
+      if (key.taxable) taxable += (value * key.price);
     });
+    return taxable;
   }
 }

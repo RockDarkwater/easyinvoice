@@ -9,7 +9,7 @@ class CustomerAddress extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     List<Widget> addy = [];
-    addy.add(Text('${customer.billingName}'));
+    addy.insert(0, Text('${customer.billingName}'));
     if (customer.add1.trim() != '') addy.add(Text('${customer.add1}'));
     if (customer.add2.trim() != '') addy.add(Text('${customer.add2}'));
     if (customer.add3.trim() != '') addy.add(Text('${customer.add3}'));

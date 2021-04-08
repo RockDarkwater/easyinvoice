@@ -1,3 +1,4 @@
+import 'package:easyinvoice/controllers/import_controller.dart';
 import 'package:easyinvoice/models/customer.dart';
 import 'package:easyinvoice/models/item.dart';
 import 'package:easyinvoice/models/service.dart';
@@ -11,7 +12,7 @@ class Job {
   String location;
   DateTime jobDate;
   List<StationCharge> stationCharges = [];
-  Map<String, double> chargeSummary = Map();
+  Map<dynamic, double> chargeSummary = Map();
 
   Job(
       {this.customer,
@@ -22,6 +23,48 @@ class Job {
       this.jobDate,
       this.stationCharges,
       this.chargeSummary});
+
+  double lineTax(dynamic lineItem) {
+    double tax = 0;
+    stationCharges.forEach((charge) {
+      charge.itemMap.forEach((key, value) {
+        if (key.name == lineItem.name)
+          tax += key.price * value * customer.taxRate / 100;
+      });
+      charge.serviceMap.forEach((key, value) {
+        if (key.name == lineItem.name) {
+          tax += key.price * value * customer.taxRate / 100;
+        }
+      });
+    });
+    return tax;
+  }
+
+  priceServices() {
+    if (customer != null) {
+      stationCharges.forEach((charge) {
+        charge.serviceMap.forEach((key, value) {
+          //calc tax if station has items
+          if (charge.itemMap.length > 0) {
+            if (key.serviceCode.toLowerCase() == 'calibration' ||
+                key.serviceCode.toLowerCase() == 'techtime' ||
+                key.serviceCode.toLowerCase() == 'witness') {
+              key.taxable = true;
+            }
+          }
+          key.price = customer.priceMap[key.serviceCode.toLowerCase()];
+        });
+      });
+    }
+  }
+
+  double jobTotal() {
+    double price = 0;
+    chargeSummary.forEach((key, value) {
+      price += key.price * value;
+    });
+    return price;
+  }
 
   String jobSummary() {
     String string = '';

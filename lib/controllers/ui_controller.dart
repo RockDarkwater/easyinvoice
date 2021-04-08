@@ -8,7 +8,7 @@ class UIController extends GetxController {
   final screenSize = Size(0, 0).obs;
   final invWidth = 0.0.obs;
   final invoiceTextStyle = TextStyle(
-    fontSize: 8,
+    fontSize: 12,
     fontWeight: FontWeight.w100,
   );
 

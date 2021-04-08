@@ -24,13 +24,14 @@ class SubHeader extends StatelessWidget {
           Expanded(
               flex: 3,
               child: Padding(
-                padding: EdgeInsets.all(uiController.invWidth.value * 3 / 100),
+                padding: EdgeInsets.only(
+                    left: uiController.invWidth.value * 3 / 100),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Padding(
                       padding: EdgeInsets.only(
-                          left: uiController.invWidth.value * 5 / 100),
+                          left: uiController.invWidth.value * 2 / 100),
                       child: CustomerAddress(job.customer),
                     ),
                     Text('Following Are Charges for: ${job.jobSummary()}'),
@@ -48,6 +49,7 @@ class SubHeader extends StatelessWidget {
               Text('Terms:'),
               Text('HMCO Code:'),
               Text('PO#:'),
+              Text(''),
               Text('Tech Name:'),
               Text('Location:'),
             ],
@@ -64,6 +66,7 @@ class SubHeader extends StatelessWidget {
                 Text('Net 30'),
                 Text('${job.customer.custNum ?? ''}'),
                 Text('${job.poNumber ?? job.customer.poNum ?? ''}'),
+                Text(''),
                 Text('${job.techName ?? ''}'),
                 Text('${job.location ?? ''}'),
               ],
