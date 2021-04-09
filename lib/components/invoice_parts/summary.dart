@@ -97,7 +97,7 @@ class InvoiceSummary extends StatelessWidget {
                                   Expanded(
                                     flex: 2,
                                     child: Text(
-                                      '(${job.lineTax(job.chargeSummary.keys.toList()[index]).toStringAsFixed(2)})',
+                                      '(${formatCurrency.format(uiController.roundTo(job.lineTax(job.chargeSummary.keys.toList()[index]), 2))})',
                                       style: uiController.invoiceTextStyle,
                                     ),
                                   ),

@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:easyinvoice/models/job.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
@@ -15,5 +17,9 @@ class UIController extends GetxController {
   setSizes(BuildContext context) {
     screenSize.value = MediaQuery.of(context).size;
     invWidth.value = screenSize.value.width * 7 / 11;
+  }
+
+  double roundTo(double value, int decimalPlaces) {
+    return (value * pow(10, decimalPlaces)).round() / pow(10, decimalPlaces);
   }
 }

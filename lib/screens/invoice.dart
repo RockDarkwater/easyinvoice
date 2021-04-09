@@ -32,21 +32,24 @@ class Invoice extends StatelessWidget {
                   decoration: BoxDecoration(color: Colors.orange[200]),
                 ),
               )),
-              Container(
-                padding: EdgeInsets.all(uiController.invWidth.value * 1 / 100),
-                decoration: BoxDecoration(color: Colors.orange[50]),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    InvoiceHeader(job),
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 8.0),
-                      child: SubHeader(job),
+              SingleChildScrollView(
+                  controller: ScrollController(),
+                  child: Container(
+                    padding:
+                        EdgeInsets.all(uiController.invWidth.value * 1 / 100),
+                    decoration: BoxDecoration(color: Colors.orange[50]),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        InvoiceHeader(job),
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 8.0),
+                          child: SubHeader(job),
+                        ),
+                        InvoiceSummary(job),
+                      ],
                     ),
-                    InvoiceSummary(job),
-                  ],
-                ),
-              ),
+                  )),
               Expanded(
                   child: GestureDetector(
                 onTap: () {

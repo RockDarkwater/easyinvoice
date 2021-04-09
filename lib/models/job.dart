@@ -1,4 +1,3 @@
-import 'package:easyinvoice/controllers/import_controller.dart';
 import 'package:easyinvoice/models/customer.dart';
 import 'package:easyinvoice/models/item.dart';
 import 'package:easyinvoice/models/service.dart';
@@ -26,6 +25,7 @@ class Job {
 
   double lineTax(dynamic lineItem) {
     double tax = 0;
+    print(lineItem.name);
     stationCharges.forEach((charge) {
       charge.itemMap.forEach((key, value) {
         if (key.name == lineItem.name)
@@ -33,7 +33,8 @@ class Job {
       });
       charge.serviceMap.forEach((key, value) {
         if (key.name == lineItem.name) {
-          tax += key.price * value * customer.taxRate / 100;
+          if (key?.taxable ?? false)
+            tax += key.price * value * customer.taxRate / 100;
         }
       });
     });
