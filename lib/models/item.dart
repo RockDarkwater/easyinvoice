@@ -1,4 +1,5 @@
 class Item {
+  final bool isItem = true;
   final String itemCode;
   final String name;
   final double price;

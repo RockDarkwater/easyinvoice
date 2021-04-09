@@ -1,4 +1,5 @@
 class Service {
+  final bool isItem = false;
   final String serviceCode;
   final String name;
   final String qbName;

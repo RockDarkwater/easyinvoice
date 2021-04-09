@@ -1,9 +1,11 @@
 import 'package:easyinvoice/components/invoice_parts/header.dart';
+import 'package:easyinvoice/components/invoice_parts/station_charges.dart';
 import 'package:easyinvoice/components/invoice_parts/sub_header.dart';
 import 'package:easyinvoice/components/invoice_parts/summary.dart';
 import 'package:easyinvoice/controllers/import_controller.dart';
 import 'package:easyinvoice/controllers/ui_controller.dart';
 import 'package:easyinvoice/models/job.dart';
+import 'package:easyinvoice/models/station_charge.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -47,6 +49,7 @@ class Invoice extends StatelessWidget {
                           child: SubHeader(job),
                         ),
                         InvoiceSummary(job),
+                        StationCharges(job),
                       ],
                     ),
                   )),
