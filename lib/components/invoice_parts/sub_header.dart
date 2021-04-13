@@ -36,8 +36,7 @@ class SubHeader extends StatelessWidget {
                     ),
                     Text('Following Are Charges for: ${job.jobSummary()}'),
                     Text(''),
-                    Text(
-                        'Work Performed: ${DateFormat.yMd().format(job.jobDate)}'),
+                    Text('Work Performed: ${job.dateSpan()}'),
                   ],
                 ),
               )),

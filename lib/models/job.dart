@@ -4,6 +4,7 @@ import 'package:easyinvoice/models/customer.dart';
 import 'package:easyinvoice/models/item.dart';
 import 'package:easyinvoice/models/service.dart';
 import 'package:easyinvoice/models/station_charge.dart';
+import 'package:intl/intl.dart';
 
 class Job {
   Customer customer;
@@ -11,7 +12,6 @@ class Job {
   String poNumber;
   String requisitioner;
   String location;
-  DateTime jobDate;
   List<StationCharge> stationCharges = [];
   Map<dynamic, double> chargeSummary = Map();
 
@@ -21,13 +21,50 @@ class Job {
       this.poNumber,
       this.requisitioner,
       this.location,
-      this.jobDate,
       this.stationCharges,
       this.chargeSummary});
 
+  String dateSpan() {
+    DateTime minDate = DateTime(3500, 1, 1);
+    DateTime maxDate = DateTime(1900, 1, 1);
+
+    stationCharges.forEach((charge) {
+      if (charge.jobDate.isBefore(minDate)) minDate = charge.jobDate;
+      if (charge.jobDate.isAfter(maxDate)) maxDate = charge.jobDate;
+    });
+
+    if (minDate != maxDate) {
+      return '${DateFormat.yMd().format(minDate)} - ${DateFormat.yMd().format(maxDate)}';
+    } else {
+      return '${DateFormat.yMd().format(maxDate)}';
+    }
+  }
+
+  List<String> headerRow() {
+    List<String> list = [];
+    list.add('Number');
+    list.add('Name');
+    list.add('Date');
+
+    chargeSummary.forEach((key, value) {
+      if (!key.isItem && !list.contains(key.name)) {
+        list.add('${key.name}');
+      }
+    });
+    if (stationCharges
+            .where((charge) => charge.itemMap.length > 0)
+            .toList()
+            .length >
+        0) list.add('Parts');
+    if (jobTaxTotal() > 0) list.add('Tax');
+    list.add('Total');
+    list.add('Cost Center');
+    return list;
+  }
+
   double lineTax(dynamic lineItem) {
     double tax = 0;
-    print(lineItem.name);
+
     stationCharges.forEach((charge) {
       charge.itemMap.forEach((key, value) {
         if (key.name == lineItem.name)

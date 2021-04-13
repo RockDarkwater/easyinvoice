@@ -24,7 +24,7 @@ class StationCharges extends StatelessWidget {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 crossAxisAlignment: CrossAxisAlignment.center,
-                children: headerRow(job),
+                children: chargeBody(),
               ),
             ),
           ),
@@ -33,44 +33,43 @@ class StationCharges extends StatelessWidget {
     );
   }
 
-  List<Widget> headerRow(Job job) {
-    List<Widget> headers = [];
-    TextStyle headerStyle = TextStyle(fontSize: 10);
-    headers.add(Text(
-      'Lease Number',
-      style: headerStyle,
-    ));
-    headers.add(Text(
-      'Lease Name',
-      style: headerStyle,
-    ));
-    headers.add(Text(
-      'Job Date',
-      style: headerStyle,
-    ));
-    job.chargeSummary.forEach((key, value) {
-      if (!key.isItem)
-        headers.add(Text(
-          '${key.name}',
-          style: headerStyle,
-        ));
+  List<Widget> chargeBody() {
+    List<Widget> body = [];
+    List<String> headers = job.headerRow();
+    List<Widget> list;
+    Column column;
+
+    headers.forEach((header) {
+      list = [];
+      list.add(Text('$header'));
+
+      job.stationCharges.forEach((charge) {
+        switch ('$header') {
+          case 'Parts':
+            list.add(Text('${charge.partCost()}'));
+            break;
+          case 'Tax':
+            list.add(Text(
+                '${charge.taxableAmount(job?.customer?.taxRate ?? 8.25)}'));
+            break;
+          case 'Total':
+            list.add(Text(
+                '${charge.totalCharge() + (charge.taxableAmount(job?.customer?.taxRate ?? 8.25))}'));
+            break;
+          case 'Cost Center':
+            list.add(Text(''));
+            break;
+          default:
+            list.add(Text('${charge.toJson()[header] ?? ''}'));
+        }
+      });
+
+      column = Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: list,
+      );
+      body.add(column);
     });
-    headers.add(Text(
-      'Parts',
-      style: headerStyle,
-    ));
-    headers.add(Text(
-      'Sales Tax',
-      style: headerStyle,
-    ));
-    headers.add(Text(
-      'Total',
-      style: headerStyle,
-    ));
-    headers.add(Text(
-      'Cost Center',
-      style: headerStyle,
-    ));
-    return headers;
+    return body;
   }
 }

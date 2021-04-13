@@ -19,7 +19,6 @@ Future<void> testJob() async {
 
   controller.jobs.add(Job(
       customer: cust,
-      jobDate: DateTime(2021, 4, 1),
       poNumber: '101020301',
       location: 'Your moms house',
       requisitioner: 'This guy',
@@ -28,6 +27,7 @@ Future<void> testJob() async {
         StationCharge(
             leaseName: 'Test Lease 1',
             leaseNumber: '12345',
+            jobDate: DateTime(2021, 4, 1),
             serviceMap: {
               cal: 1,
               gas: 1,
@@ -39,6 +39,7 @@ Future<void> testJob() async {
         StationCharge(
           leaseName: 'Test Lease 2',
           leaseNumber: '23456',
+          jobDate: DateTime(2021, 4, 2),
           serviceMap: {
             cal: 1,
             gas: 3,

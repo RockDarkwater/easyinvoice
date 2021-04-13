@@ -123,12 +123,12 @@ class ImportController extends GetxController {
             customer: customer,
             techName: techName,
             location: location,
-            jobDate: jobDate,
             chargeSummary: {},
             stationCharges: [
               StationCharge(
                 leaseName: leaseName,
                 leaseNumber: leaseNumber,
+                jobDate: jobDate,
                 notes: notes,
                 serviceMap: {service: quantity},
                 itemMap: {},
@@ -227,7 +227,6 @@ class ImportController extends GetxController {
             customer: customer,
             techName: techName,
             location: location,
-            jobDate: jobDate,
             stationCharges: [],
             chargeSummary: {});
         jobs.add(newJob);
@@ -240,6 +239,7 @@ class ImportController extends GetxController {
         newCharge = StationCharge(
           leaseName: leaseName,
           leaseNumber: leaseNumber,
+          jobDate: jobDate,
           notes: notes,
           serviceMap: {service: 0},
           itemMap: {},
@@ -366,6 +366,7 @@ class ImportController extends GetxController {
       stationCharges.add(StationCharge(
         leaseNumber: activeRow[0].toString(),
         leaseName: activeRow[1].toString(),
+        jobDate: jobDate,
         notes: activeRow[2].toString(),
         itemMap: Map.of(itemMap),
         serviceMap: Map.of(serviceMap),
@@ -381,7 +382,6 @@ class ImportController extends GetxController {
       poNumber: poNumber,
       requisitioner: requisitioner,
       location: location,
-      jobDate: jobDate,
       stationCharges: stationCharges,
       chargeSummary: summaryMap,
     ));
