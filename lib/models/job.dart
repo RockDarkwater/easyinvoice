@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:easyinvoice/models/customer.dart';
 import 'package:easyinvoice/models/item.dart';
 import 'package:easyinvoice/models/service.dart';
@@ -29,12 +31,12 @@ class Job {
     stationCharges.forEach((charge) {
       charge.itemMap.forEach((key, value) {
         if (key.name == lineItem.name)
-          tax += key.price * value * customer.taxRate / 100;
+          tax += roundTo(key.price * value * customer.taxRate / 100, 2);
       });
       charge.serviceMap.forEach((key, value) {
         if (key.name == lineItem.name) {
           if (key?.taxable ?? false)
-            tax += key.price * value * customer.taxRate / 100;
+            tax += roundTo(key.price * value * customer.taxRate / 100, 2);
         }
       });
     });
@@ -59,12 +61,27 @@ class Job {
     }
   }
 
+  double jobTaxTotal() {
+    double tax = 0;
+    stationCharges.forEach((charge) {
+      charge.itemMap.forEach((key, value) {
+        tax += roundTo(key.price * value * customer.taxRate / 100, 2);
+      });
+      charge.serviceMap.forEach((key, value) {
+        if (key?.taxable ?? false) {
+          tax += roundTo(key.price * value * customer.taxRate / 100, 2);
+        }
+      });
+    });
+    return tax;
+  }
+
   double jobTotal() {
     double price = 0;
     chargeSummary.forEach((key, value) {
       price += key.price * value;
     });
-    return price;
+    return roundTo(price, 2);
   }
 
   String jobSummary() {
@@ -144,5 +161,9 @@ class Job {
     }
 
     return price;
+  }
+
+  double roundTo(double value, int decimalPlaces) {
+    return (value * pow(10, decimalPlaces)).round() / pow(10, decimalPlaces);
   }
 }

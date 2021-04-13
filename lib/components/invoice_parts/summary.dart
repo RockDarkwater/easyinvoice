@@ -13,6 +13,7 @@ class InvoiceSummary extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Size screen = MediaQuery.of(context).size;
     return Container(
       width: uiController.invWidth.value,
       child: Column(
@@ -34,7 +35,7 @@ class InvoiceSummary extends StatelessWidget {
                     child: Row(
                       children: [
                         Expanded(flex: 1, child: Text('Qty')),
-                        Expanded(flex: 5, child: Text('Service')),
+                        Expanded(flex: 12, child: Text('Service')),
                         Expanded(flex: 2, child: Text('Price')),
                         Expanded(flex: 2, child: Text('Total')),
                         Expanded(flex: 2, child: Text('Sales Tax')),
@@ -71,7 +72,7 @@ class InvoiceSummary extends StatelessWidget {
                                   ),
                                   //Description
                                   Expanded(
-                                    flex: 5,
+                                    flex: 12,
                                     child: Text(
                                       '${job.chargeSummary.keys.toList()[index].name}',
                                       style: uiController.invoiceTextStyle,
@@ -97,7 +98,7 @@ class InvoiceSummary extends StatelessWidget {
                                   Expanded(
                                     flex: 2,
                                     child: Text(
-                                      '(${formatCurrency.format(uiController.roundTo(job.lineTax(job.chargeSummary.keys.toList()[index]), 2))})',
+                                      '(${formatCurrency.format(job.lineTax(job.chargeSummary.keys.toList()[index]))})',
                                       style: uiController.invoiceTextStyle,
                                     ),
                                   ),
@@ -106,6 +107,52 @@ class InvoiceSummary extends StatelessWidget {
                             )),
                       );
                     }),
+                Divider(),
+                Padding(
+                  padding: EdgeInsets.only(left: screen.width / 3),
+                  child: Align(
+                    alignment: Alignment.centerRight,
+                    child: Padding(
+                      padding: EdgeInsets.only(right: screen.width / 10),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text('Sales Tax:'),
+                          Padding(
+                            padding: const EdgeInsets.only(left: 12.0),
+                            child: Text(
+                                '${formatCurrency.format(job.jobTaxTotal())}'),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                Divider(
+                  indent: screen.width / 2.5,
+                  endIndent: screen.width / 25,
+                ),
+                Padding(
+                  padding: EdgeInsets.only(left: screen.width / 3, bottom: 8.0),
+                  child: Align(
+                      alignment: Alignment.centerRight,
+                      child: Padding(
+                        padding: EdgeInsets.only(right: screen.width / 10),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text('Total:'),
+                            Padding(
+                              padding: const EdgeInsets.only(left: 12.0),
+                              child: Text(
+                                  '${formatCurrency.format(job.jobTotal())}'),
+                            ),
+                          ],
+                        ),
+                      )),
+                ),
               ],
             ),
           )
