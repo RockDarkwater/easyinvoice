@@ -107,7 +107,9 @@ class InvoiceSummary extends StatelessWidget {
                             )),
                       );
                     }),
-                Divider(),
+                Divider(
+                  color: Colors.black,
+                ),
                 Padding(
                   padding: EdgeInsets.only(left: screen.width / 3),
                   child: Align(
@@ -132,6 +134,7 @@ class InvoiceSummary extends StatelessWidget {
                 Divider(
                   indent: screen.width / 2.5,
                   endIndent: screen.width / 25,
+                  color: Colors.black,
                 ),
                 Padding(
                   padding: EdgeInsets.only(left: screen.width / 3, bottom: 8.0),
