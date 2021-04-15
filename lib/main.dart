@@ -6,18 +6,20 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:get/get.dart';
 
-// Todo:
+// TODO:
 
 // - job splitting based on customer needs.
-// - test import charge counting.
-// - create 'add customer' dialog when parsing customer
-// - header with prompt for choosing customer dialog
-// - ui to interact with customers, prices, items, and services.
-// - invoice template
+//    - 5 field rule: incoming customer, bool test (field + value), change to make (field + value)
+//    - JSON string for job (granular), useful for searches.
+//    - parent # = pricing, billing # = location, QB# = upload
+
+// - ui to interact with customers, service prices, items, services, and rules.
+//    - update items from QB list.
 
 // - link to local email program, or method to send from "invoicing@howardmeasurement.com"
 // - ADP and QB export files.
 
+// - Cimarex invoice template
 // - enable desktop mode?
 
 void main() {

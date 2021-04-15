@@ -5,7 +5,6 @@ import 'package:easyinvoice/components/invoice_parts/summary.dart';
 import 'package:easyinvoice/controllers/import_controller.dart';
 import 'package:easyinvoice/controllers/ui_controller.dart';
 import 'package:easyinvoice/models/job.dart';
-import 'package:easyinvoice/models/station_charge.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
