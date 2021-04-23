@@ -16,4 +16,17 @@ class Service {
       this.workUnits,
       this.price,
       this.taxable});
+
+  String toJSONString(String path) {
+    Map map = {
+      '$path.isItem': isItem,
+      '$path.serviceCode': serviceCode,
+      '$path.name': name,
+      '$path.qbName': qbName,
+      '$path.category': category,
+      '$path.workUnits': workUnits,
+      '$path.taxable': taxable,
+    };
+    return map.toString();
+  }
 }

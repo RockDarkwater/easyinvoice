@@ -24,6 +24,28 @@ class Job {
       this.stationCharges,
       this.chargeSummary});
 
+  String toJSONString() {
+    Map statChg = Map();
+    int i = 0;
+    stationCharges.forEach((element) {
+      statChg.putIfAbsent(
+          statChg.length, () => element.toJSONString('stationCharge.$i'));
+      i++;
+    });
+
+    Map map = {
+      'customer': customer.toJSONString('customer'),
+      'techName': techName,
+      'poNumber': poNumber,
+      'requisitioner': requisitioner,
+      'location': location,
+      'stationCharges': statChg.toString(),
+      'totalStations': stationCharges.length,
+    };
+
+    return map.toString();
+  }
+
   String dateSpan() {
     DateTime minDate = DateTime(3500, 1, 1);
     DateTime maxDate = DateTime(1900, 1, 1);

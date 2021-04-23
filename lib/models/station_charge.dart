@@ -21,6 +21,32 @@ class StationCharge {
       this.serviceMap,
       this.itemMap});
 
+  String toJSONString(String path) {
+    Map servs = Map();
+    Map items = Map();
+    int i = 0;
+    serviceMap.forEach((key, value) {
+      servs['$path.${key.toJSONString("$path.serviceMap.$i")}'] = value;
+      i++;
+    });
+    i = 0;
+    itemMap.forEach((key, value) {
+      items['$path.${key.toJSONString("$path.itemMap.$i")}'] = value;
+      i++;
+    });
+
+    Map map = {
+      '$path.leaseName': leaseName,
+      '$path.leaseNumber': leaseNumber,
+      '$path.jobDate': jobDate,
+      '$path.notes': notes,
+      '$path.serviceMap': servs.toString(),
+      '$path.itemMap': items.toString(),
+    };
+
+    return map.toString();
+  }
+
   Map<String, dynamic> toJson() {
     Map<String, dynamic> map = Map();
 

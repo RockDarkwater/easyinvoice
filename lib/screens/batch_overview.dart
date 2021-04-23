@@ -18,7 +18,7 @@ class OverviewScreen extends StatelessWidget {
         title: Text('EasyInvoice v0.0.1'),
       ),
       body: FutureBuilder(
-        future: controller.import(), //testJob(), //
+        future: testJob(), //controller.import(), //
         builder: (context, snapshot) {
           if (snapshot.connectionState != ConnectionState.done) {
             controller.importQty.value = 1;
@@ -127,6 +127,8 @@ class OverviewScreen extends StatelessWidget {
                                             '${controller.jobs[index].countCharges()} items charged, Total: ' +
                                             '${formatCurrency.format(controller.jobs[index].priceJob())}')),
                                     onTap: () {
+                                      // print(
+                                      //     '${controller.jobs[index].toJSONString()}');
                                       uiController.currentJob.value =
                                           controller.jobs[index];
                                       uiController.invView.value = true;

@@ -38,6 +38,29 @@ class Customer {
       this.requisitioner,
       this.taxRate,
       this.ccFee});
+
+  String toJSONString(String path) {
+    Map map = {
+      '$path.custNum': custNum,
+      '$path.primarySubmit': primarySubmit.toString(),
+      '$path.billingName': billingName,
+      '$path.add1': add1,
+      '$path.add2': add2,
+      '$path.add3': add3,
+      '$path.secondarySubmit': secondarySubmit.toString(),
+      '$path.city': city,
+      '$path.state': state,
+      '$path.zip': zip,
+      '$path.custClass': custClass,
+      '$path.distList': distList,
+      '$path.fieldArea': fieldArea,
+      '$path.poNum': poNum,
+      '$path.requisitioner': requisitioner,
+      '$path.taxRate': taxRate,
+      '$path.ccFee': ccFee
+    };
+    return map.toString();
+  }
 }
 
 enum SubmitOption { email, mail, openinvoice, ariba, none }

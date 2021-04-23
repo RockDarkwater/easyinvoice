@@ -7,4 +7,14 @@ class Item {
   final bool taxable = true;
 
   Item({this.itemCode, this.name, this.price, this.cost});
+
+  String toJSONString(String path) {
+    Map map = {
+      '$path.isItem': isItem,
+      '$path.itemCode': itemCode,
+      '$path.name': name,
+      '$path.taxable': taxable,
+    };
+    return map.toString();
+  }
 }
