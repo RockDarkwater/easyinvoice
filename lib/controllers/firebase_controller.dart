@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easyinvoice/models/customer.dart';
 import 'package:easyinvoice/models/item.dart';
+import 'package:easyinvoice/models/rule.dart';
 import 'package:easyinvoice/models/service.dart';
 import 'package:easyinvoice/test/generic_price_map.dart';
 import 'package:get/get.dart';
@@ -23,13 +24,40 @@ class FireBaseController extends GetxController {
     return Item(itemCode: itemCode, name: name, price: price, cost: cost);
   }
 
+  Future<List<Rule>> getRules(String custID) async {
+    List<Rule> list = [];
+    Rule rule;
+    QuerySnapshot rules;
+    rules = await firebase
+        .collection('rules')
+        ?.doc('$custID')
+        ?.collection('custRules')
+        ?.get();
+    if (rules?.docs?.length != null) {
+      rules.docs.forEach((ruleDoc) {
+        rule = Rule(
+          boolField: ruleDoc.data()['boolField'],
+          boolValue: ruleDoc.data()['boolValue'],
+          ruleField: ruleDoc.data()['ruleField'],
+          ruleValue: ruleDoc.data()['ruleValue'],
+        );
+        print('${rule.toString()}');
+        list.add(rule);
+      });
+    }
+
+    return list;
+  }
+
   Future<Customer> getCustomer(String custNum) async {
     DocumentSnapshot doc;
     DocumentSnapshot doc2;
     SubmitOption primarySubmit;
+    int parentCustomer;
     String billingName;
     Map<String, dynamic> priceMap;
     Map<String, dynamic> genericMap = genericPriceMap();
+    List<Rule> rules = await getRules(custNum);
     String add1;
     String add2;
     String add3;
@@ -46,16 +74,24 @@ class FireBaseController extends GetxController {
     bool ccFee;
 
     // print('searching for $custNum');
-    doc2 = await firebase.collection('servicePrices')?.doc('$custNum')?.get();
+
     doc = await firebase.collection('customers')?.doc('$custNum')?.get();
-    if (!doc2.exists) priceMap = Map.from(genericMap);
 
     if (doc.exists) {
       primarySubmit = SubmitOption.values.firstWhere((element) =>
           element.toString().split('.')[1] ==
           doc.data()['primarySubmit'].toString());
       billingName = doc.data()['billingName'];
-      priceMap ??= Map.from(doc2.data());
+      parentCustomer = doc.data()['parentCustomer'];
+
+      doc2 = await firebase
+          .collection('servicePrices')
+          ?.doc('$parentCustomer')
+          ?.get();
+      (!doc2.exists)
+          ? priceMap = Map.from(genericMap)
+          : priceMap ??= Map.from(doc2.data());
+
       for (var key in genericMap.keys) {
         if (!priceMap.keys.contains(key)) priceMap[key] = genericMap[key];
       }
@@ -81,6 +117,7 @@ class FireBaseController extends GetxController {
           custNum: custNum,
           billingName: billingName,
           primarySubmit: primarySubmit,
+          parentCustomer: parentCustomer,
           priceMap: priceMap,
           add1: add1,
           add2: add2,
@@ -95,7 +132,8 @@ class FireBaseController extends GetxController {
           poNum: poNum,
           requisitioner: requisitioner,
           taxRate: taxRate,
-          ccFee: ccFee);
+          ccFee: ccFee,
+          rules: rules);
     } else
       return null;
   }

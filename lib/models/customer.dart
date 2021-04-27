@@ -1,3 +1,5 @@
+import 'package:easyinvoice/models/rule.dart';
+
 class Customer {
   final String custNum;
   final SubmitOption primarySubmit;
@@ -8,6 +10,7 @@ class Customer {
   String add2;
   String add3;
   SubmitOption secondarySubmit;
+  int parentCustomer;
   String city;
   String state;
   String zip;
@@ -18,12 +21,14 @@ class Customer {
   String requisitioner;
   double taxRate;
   bool ccFee;
+  List<Rule> rules;
 
   Customer(
       {this.custNum,
       this.billingName,
       this.primarySubmit,
       this.priceMap,
+      this.parentCustomer,
       this.add1,
       this.add2,
       this.add3,
@@ -37,13 +42,15 @@ class Customer {
       this.poNum,
       this.requisitioner,
       this.taxRate,
-      this.ccFee});
+      this.ccFee,
+      this.rules});
 
   String toJSONString(String path) {
     Map map = {
       '$path.custNum': custNum,
       '$path.primarySubmit': primarySubmit.toString(),
       '$path.billingName': billingName,
+      '$path.parentCustomer': parentCustomer.toString(),
       '$path.add1': add1,
       '$path.add2': add2,
       '$path.add3': add3,
