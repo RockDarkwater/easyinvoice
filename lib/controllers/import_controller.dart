@@ -14,11 +14,41 @@ import 'package:get/get.dart';
 
 class ImportController extends GetxController {
   RxList<Job> jobs = <Job>[].obs;
+  var parents = Map<int, String>().obs;
   RxInt importQty = 1.obs;
   RxInt currentImport = 1.obs;
   RxInt processQty = 1.obs;
   RxInt currentProcess = 1.obs;
   RxList<String> resultNames = <String>[''].obs;
+
+  double countCustCharges(int custId) {
+    double total = 0;
+    jobs
+        .where((job) => job.customer.parentCustomer.keys.first == custId)
+        .forEach((custJob) {
+      total += custJob.countCharges();
+    });
+    return total;
+  }
+
+  double priceCustomer(int custID) {
+    double total = 0;
+    jobs
+        .where((job) => job.customer.parentCustomer.keys.first == custID)
+        .forEach((custJob) {
+      total += custJob.priceJob();
+    });
+    return total;
+  }
+
+  compileParents() {
+    int parentNum;
+    jobs.forEach((job) {
+      parentNum = job.customer.parentCustomer.keys.first;
+      parents.putIfAbsent(
+          parentNum, () => job.customer.parentCustomer[parentNum]);
+    });
+  }
 
   Future<void> import() async {
     print('starting import.');
@@ -68,6 +98,7 @@ class ImportController extends GetxController {
     jobs.forEach((job) {
       job.priceServices();
     });
+    compileParents();
   }
 
   Future<void> buildAmisJobs(List<List<String>> data, String date) async {

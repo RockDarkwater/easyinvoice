@@ -21,7 +21,7 @@ class BatchScreen extends StatelessWidget {
           return Obx(() => Invoice(uiController.currentJob.value));
         } else {
           return StreamBuilder(
-            stream: controller.jobs.stream,
+            stream: controller.parents.stream,
             builder: (context, _) {
               return Stack(
                 children: [
@@ -29,7 +29,7 @@ class BatchScreen extends StatelessWidget {
                     child: GestureDetector(
                       onTap: () {
                         print('Tapped on Upload');
-                        if (controller.jobs.length > 0) {
+                        if (controller.parents.length > 0) {
                           Get.to(() => UploadScreen(),
                               transition: Transition.noTransition);
                         }
@@ -53,38 +53,40 @@ class BatchScreen extends StatelessWidget {
                           ),
                           Flexible(
                             child: ListView.builder(
-                              itemCount: controller.jobs.length,
+                              itemCount: controller.parents.length,
                               scrollDirection: Axis.vertical,
                               itemBuilder: (context, index) {
                                 return ListTile(
-                                  title: Obx(() => Text(
-                                      'C - ${controller.jobs[index].customer.custNum}: ' +
-                                          '${controller.jobs[index].customer.billingName} - ' +
-                                          '${controller.jobs[index].countCharges()} items charged, Total: ' +
-                                          '${formatCurrency.format(controller.jobs[index].priceJob())}')),
+                                  title: Center(
+                                    child: Obx(() => Text(
+                                        'C - ${controller.parents.keys.toList()[index]}: ' +
+                                            '${controller.parents[controller.parents.keys.toList()[index]]} - ' +
+                                            '${controller.countCustCharges(controller.parents.keys.toList()[index])} items charged, Total: ' +
+                                            '${formatCurrency.format(controller.priceCustomer(controller.parents.keys.toList()[index]))}')),
+                                  ),
                                   onTap: () {
                                     // print(
                                     //     '${controller.jobs[index].toJSONString()}');
-                                    uiController.currentJob.value =
-                                        controller.jobs[index];
-                                    uiController.invView.value = true;
+                                    // uiController.currentJob.value =
+                                    //     controller.jobs[index];
+                                    // uiController.invView.value = true;
                                   },
                                   focusColor: Colors.white54,
-                                  leading: TextButton(
-                                    onPressed: () {
-                                      controller.jobs.removeAt(index);
-                                      if (controller.jobs.length == 0) {
-                                        Get.back();
-                                        controller.currentImport.value = 1;
-                                        controller.importQty.value = 1;
-                                        controller.processQty.value = 1;
-                                        controller.currentProcess.value = 1;
-                                        controller.resultNames.clear();
-                                        controller.resultNames.add('');
-                                      }
-                                    },
-                                    child: Icon(Icons.remove),
-                                  ),
+                                  // leading: TextButton(
+                                  //   onPressed: () {
+                                  //     controller.jobs.removeAt(index);
+                                  //     if (controller.jobs.length == 0) {
+                                  //       Get.back();
+                                  //       controller.currentImport.value = 1;
+                                  //       controller.importQty.value = 1;
+                                  //       controller.processQty.value = 1;
+                                  //       controller.currentProcess.value = 1;
+                                  //       controller.resultNames.clear();
+                                  //       controller.resultNames.add('');
+                                  //     }
+                                  //   },
+                                  //   child: Icon(Icons.remove),
+                                  // ),
                                 );
                               },
                             ),

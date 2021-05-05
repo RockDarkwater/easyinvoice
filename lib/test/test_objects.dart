@@ -54,4 +54,5 @@ Future<void> testJob() async {
         plate: 2
       }));
   controller.jobs.last.priceServices();
+  controller.compileParents();
 }

@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class LoadingScreen extends StatelessWidget {
-  UIController uiController = Get.find();
-  ImportController controller = Get.find();
+  final UIController uiController = Get.find();
+  final ImportController controller = Get.find();
   @override
   Widget build(BuildContext context) {
     return Center(

@@ -10,7 +10,7 @@ class Customer {
   String add2;
   String add3;
   SubmitOption secondarySubmit;
-  int parentCustomer;
+  Map<int, String> parentCustomer;
   String city;
   String state;
   String zip;
@@ -50,7 +50,7 @@ class Customer {
       '$path.custNum': custNum,
       '$path.primarySubmit': primarySubmit.toString(),
       '$path.billingName': billingName,
-      '$path.parentCustomer': parentCustomer.toString(),
+      '$path.parentCustomer': parentCustomer,
       '$path.add1': add1,
       '$path.add2': add2,
       '$path.add3': add3,

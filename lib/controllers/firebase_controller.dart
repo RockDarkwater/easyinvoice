@@ -53,7 +53,7 @@ class FireBaseController extends GetxController {
     DocumentSnapshot doc;
     DocumentSnapshot doc2;
     SubmitOption primarySubmit;
-    int parentCustomer;
+    Map<int, String> parentCustomer = Map();
     String billingName;
     Map<String, dynamic> priceMap;
     Map<String, dynamic> genericMap = genericPriceMap();
@@ -82,15 +82,17 @@ class FireBaseController extends GetxController {
           element.toString().split('.')[1] ==
           doc.data()['primarySubmit'].toString());
       billingName = doc.data()['billingName'];
-      parentCustomer = doc.data()['parentCustomer'];
 
       doc2 = await firebase
           .collection('servicePrices')
-          ?.doc('$parentCustomer')
+          ?.doc('${doc.data()['parentCustomer']}')
           ?.get();
       (!doc2.exists)
           ? priceMap = Map.from(genericMap)
           : priceMap ??= Map.from(doc2.data());
+
+      parentCustomer[doc.data()['parentCustomer']] = priceMap['name'];
+      priceMap.remove('name');
 
       for (var key in genericMap.keys) {
         if (!priceMap.keys.contains(key)) priceMap[key] = genericMap[key];
