@@ -15,7 +15,7 @@ class BatchScreen extends StatelessWidget {
   void bounceBack() {
     print('Tapped on Upload');
     if (controller.parents.length > 0) {
-      Get.to(() => UploadScreen(), transition: Transition.noTransition);
+      Get.off(() => UploadScreen(), transition: Transition.noTransition);
     }
   }
 
@@ -72,12 +72,17 @@ class BatchScreen extends StatelessWidget {
                                             '${formatCurrency.format(controller.priceCustomer(controller.parents.keys.toList()[index]))}')),
                                   ),
                                   onTap: () {
-                                    uiController.currentJob.value =
-                                        controller.jobs.firstWhere((job) =>
+                                    //set current jobs to all jobs with the clicked parent.
+                                    uiController.currentJobs.assignAll(
+                                        controller.jobs.where((job) =>
                                             job.customer.parentCustomer.keys
                                                 .first ==
                                             controller.parents.keys
-                                                .toList()[index]);
+                                                .toList()[index]));
+                                    //submit first job to invoice
+                                    uiController.currentJob.value =
+                                        uiController.currentJobs.first;
+                                    //set invoice view to true to rebuild view
                                     uiController.invView.value = true;
                                   },
                                   tileColor: Colors.grey[200],
@@ -90,6 +95,7 @@ class BatchScreen extends StatelessWidget {
                                               .first ==
                                           controller.parents.keys
                                               .toList()[index]);
+
                                       if (controller.jobs.length == 0) {
                                         Get.back();
                                         controller.currentImport.value = 1;
@@ -98,6 +104,9 @@ class BatchScreen extends StatelessWidget {
                                         controller.currentProcess.value = 1;
                                         controller.resultNames.clear();
                                         controller.resultNames.add('');
+                                        controller.parents.clear();
+                                      } else {
+                                        controller.compileParents();
                                       }
                                     },
                                     child: Icon(Icons.remove),

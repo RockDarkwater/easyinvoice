@@ -8,6 +8,7 @@ import 'package:get/get.dart';
 class UIController extends GetxController {
   final invView = false.obs;
   final currentJob = Job().obs;
+  final currentJobs = <Job>[].obs;
   final screenSize = Size(0, 0).obs;
   final invWidth = 0.0.obs;
   final TextTheme textTheme = TextTheme(

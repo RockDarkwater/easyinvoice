@@ -8,6 +8,8 @@ import 'package:get/get.dart';
 
 // TODO:
 
+// - Add total and Tax Total to invoice
+
 // - job splitting based on customer needs.
 //    - 5 field rule: incoming customer, bool test (field + value), change to make (field + value)
 //    - JSON string for job (granular), useful for searches.
