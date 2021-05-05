@@ -12,6 +12,13 @@ class BatchScreen extends StatelessWidget {
   final UIController uiController = Get.find();
   final formatCurrency = NumberFormat.simpleCurrency();
 
+  void bounceBack() {
+    print('Tapped on Upload');
+    if (controller.parents.length > 0) {
+      Get.to(() => UploadScreen(), transition: Transition.noTransition);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return StreamBuilder(
@@ -27,13 +34,7 @@ class BatchScreen extends StatelessWidget {
                 children: [
                   Container(
                     child: GestureDetector(
-                      onTap: () {
-                        print('Tapped on Upload');
-                        if (controller.parents.length > 0) {
-                          Get.to(() => UploadScreen(),
-                              transition: Transition.noTransition);
-                        }
-                      },
+                      onTap: bounceBack,
                     ),
                   ),
                   Center(
@@ -43,7 +44,13 @@ class BatchScreen extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.center,
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                          Expanded(child: Container()),
+                          Expanded(
+                              child: Container(
+                            color: Colors.grey[50],
+                            child: GestureDetector(
+                              onTap: bounceBack,
+                            ),
+                          )),
                           Padding(
                             padding: const EdgeInsets.all(16.0),
                             child: Text(
@@ -65,33 +72,47 @@ class BatchScreen extends StatelessWidget {
                                             '${formatCurrency.format(controller.priceCustomer(controller.parents.keys.toList()[index]))}')),
                                   ),
                                   onTap: () {
-                                    // print(
-                                    //     '${controller.jobs[index].toJSONString()}');
-                                    // uiController.currentJob.value =
-                                    //     controller.jobs[index];
-                                    // uiController.invView.value = true;
+                                    uiController.currentJob.value =
+                                        controller.jobs.firstWhere((job) =>
+                                            job.customer.parentCustomer.keys
+                                                .first ==
+                                            controller.parents.keys
+                                                .toList()[index]);
+                                    uiController.invView.value = true;
                                   },
-                                  focusColor: Colors.white54,
-                                  // leading: TextButton(
-                                  //   onPressed: () {
-                                  //     controller.jobs.removeAt(index);
-                                  //     if (controller.jobs.length == 0) {
-                                  //       Get.back();
-                                  //       controller.currentImport.value = 1;
-                                  //       controller.importQty.value = 1;
-                                  //       controller.processQty.value = 1;
-                                  //       controller.currentProcess.value = 1;
-                                  //       controller.resultNames.clear();
-                                  //       controller.resultNames.add('');
-                                  //     }
-                                  //   },
-                                  //   child: Icon(Icons.remove),
-                                  // ),
+                                  tileColor: Colors.grey[200],
+                                  focusColor: Colors.grey,
+                                  hoverColor: Colors.white,
+                                  leading: TextButton(
+                                    onPressed: () {
+                                      controller.jobs.removeWhere((job) =>
+                                          job.customer.parentCustomer.keys
+                                              .first ==
+                                          controller.parents.keys
+                                              .toList()[index]);
+                                      if (controller.jobs.length == 0) {
+                                        Get.back();
+                                        controller.currentImport.value = 1;
+                                        controller.importQty.value = 1;
+                                        controller.processQty.value = 1;
+                                        controller.currentProcess.value = 1;
+                                        controller.resultNames.clear();
+                                        controller.resultNames.add('');
+                                      }
+                                    },
+                                    child: Icon(Icons.remove),
+                                  ),
                                 );
                               },
                             ),
                           ),
-                          Expanded(child: Container()),
+                          Expanded(
+                              child: Container(
+                            color: Colors.grey[50],
+                            child: GestureDetector(
+                              onTap: bounceBack,
+                            ),
+                          )),
                         ],
                       ),
                     ),
