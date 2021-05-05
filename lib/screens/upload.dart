@@ -1,3 +1,4 @@
+import 'package:easyinvoice/controllers/firebase_curation_functions.dart';
 import 'package:easyinvoice/controllers/import_controller.dart';
 import 'package:easyinvoice/controllers/ui_controller.dart';
 import 'package:easyinvoice/screens/batch.dart';
@@ -24,16 +25,18 @@ class UploadScreen extends StatelessWidget {
           children: [
             Container(
               child: GestureDetector(
-                onTap: () {
-                  print('Tapped on Upload');
+                onTap: () async {
                   if (controller.jobs.length > 0) {
                     Get.to(
                         () => Scaffold(
                             appBar: AppBar(
-                              title: Text('EasyInvoice v0.0.1'),
+                              centerTitle: true,
+                              title: Text('EasyInvoice'),
                             ),
                             body: BatchScreen()),
                         transition: Transition.noTransition);
+                  } else {
+                    //await uploadServicePrices();
                   }
                 },
               ),

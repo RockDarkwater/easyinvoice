@@ -272,16 +272,21 @@ Future<void> uploadServicePrices() async {
 
       // create a customer pricing document for each row
       for (int i = 1; i < _itemSheet.maxRows; i++) {
+        if (i % 500 == 0) {
+          await batch.commit();
+          batch = fireBase.batch();
+        }
         rowMap = _itemSheet.rows[i].asMap();
-        custString = rowMap[1].toString();
+        dataString['name'] = custString = rowMap[1].toString();
 
         for (int j = 2; j < _itemSheet.maxCols; j++) {
-          if (rowMap[j].toString() != '0')
+          if (rowMap[j].toString() != '0' && rowMap[j].toString() != 'null')
             dataString[_itemSheet.rows[0][j].toString().toLowerCase()] =
                 rowMap[j];
         }
         print('$custString - ${dataString.toString()}');
-        batch.set(fireBase.collection('servicePrices').doc('$custString'),
+        batch.set(
+            fireBase.collection('servicePrices').doc('${rowMap[0].toString()}'),
             dataString);
       }
 
@@ -294,4 +299,5 @@ Future<void> uploadServicePrices() async {
       print('not a price-mapping format');
     }
   }
+  print('Done uploading price maps');
 }

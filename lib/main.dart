@@ -54,7 +54,8 @@ class App extends StatelessWidget {
             theme: ThemeData(
                 primarySwatch: Colors.deepOrange,
                 primaryColor: Colors.orange,
-                accentColor: Colors.white),
+                accentColor: Colors.white,
+                primaryTextTheme: uiController.textTheme),
             home: UploadScreen(),
           );
         }
