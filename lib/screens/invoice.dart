@@ -24,44 +24,77 @@ class Invoice extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Expanded(
-                  child: GestureDetector(
-                onTap: () {
-                  print('tapped left');
-                  uiController.invView.value = false;
-                },
-                child: Container(
-                  decoration: BoxDecoration(color: Colors.orange[200]),
-                ),
-              )),
-              SingleChildScrollView(
-                  controller: ScrollController(),
-                  child: Container(
-                    padding:
-                        EdgeInsets.all(uiController.invWidth.value * 1 / 100),
-                    decoration: BoxDecoration(color: Colors.orange[50]),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                child: Stack(
+                  children: [
+                    Center(
+                        child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        InvoiceHeader(job),
+                        Icon(Icons.arrow_back_ios_rounded),
                         Padding(
-                          padding: const EdgeInsets.only(bottom: 8.0),
-                          child: SubHeader(job),
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text('Back'),
                         ),
-                        InvoiceSummary(job),
-                        StationCharges(job),
                       ],
-                    ),
-                  )),
-              Expanded(
-                  child: GestureDetector(
-                onTap: () {
-                  print('tapped left');
-                  uiController.invView.value = false;
-                },
-                child: Container(
-                  decoration: BoxDecoration(color: Colors.orange[200]),
+                    )),
+                    Container(child: GestureDetector(onTap: () {
+                      print('tapped left');
+                      uiController.invView.value = false;
+                    })),
+                  ],
                 ),
-              )),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(left: 25, right: 25.0),
+                child: SingleChildScrollView(
+                    controller: ScrollController(),
+                    child: Container(
+                      padding:
+                          EdgeInsets.all(uiController.invWidth.value * 3 / 100),
+                      decoration:
+                          BoxDecoration(color: Colors.white, boxShadow: [
+                        BoxShadow(
+                          spreadRadius: 2,
+                          blurRadius: 40,
+                          color: Colors.grey,
+                          offset: Offset(1, 5),
+                        ),
+                      ]),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          InvoiceHeader(job),
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: 8.0),
+                            child: SubHeader(job),
+                          ),
+                          InvoiceSummary(job),
+                          StationCharges(job),
+                        ],
+                      ),
+                    )),
+              ),
+              Expanded(
+                child: Stack(
+                  children: [
+                    Center(
+                        child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.arrow_forward_ios_rounded),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text('Back'),
+                        ),
+                      ],
+                    )),
+                    Container(child: GestureDetector(onTap: () {
+                      print('tapped left');
+                      uiController.invView.value = false;
+                    })),
+                  ],
+                ),
+              ),
             ],
           ),
         ],

@@ -16,7 +16,7 @@ class SubHeader extends StatelessWidget {
 
     return Container(
       width: uiController.invWidth.value,
-      color: Colors.orange[50],
+      color: Colors.white,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,

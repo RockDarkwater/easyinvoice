@@ -28,7 +28,7 @@ class StationCharges extends StatelessWidget {
                             height: 30,
                             color: (index % 2 == 0)
                                 ? Colors.black12
-                                : Colors.orange[50]))),
+                                : Colors.white))),
               ),
               Padding(
                 padding: const EdgeInsets.only(top: 4.0, bottom: 2.0),

@@ -9,14 +9,18 @@ class UIController extends GetxController {
   final currentJob = Job().obs;
   final screenSize = Size(0, 0).obs;
   final invWidth = 0.0.obs;
+  final invoiceHeaderTextStyle = TextStyle(
+    fontSize: 22,
+    fontWeight: FontWeight.w700,
+  );
   final invoiceTextStyle = TextStyle(
-    fontSize: 12,
-    fontWeight: FontWeight.w100,
+    fontSize: 16,
+    fontWeight: FontWeight.w200,
   );
 
   setSizes(BuildContext context) {
     screenSize.value = MediaQuery.of(context).size;
-    invWidth.value = screenSize.value.width * 7 / 11;
+    invWidth.value = screenSize.value.height * 8.5 / 11;
   }
 
   double roundTo(double value, int decimalPlaces) {

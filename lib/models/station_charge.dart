@@ -9,6 +9,8 @@ class StationCharge {
   String leaseNumber;
   DateTime jobDate;
   String notes;
+  int billingField = 1;
+  String billingFieldName;
   Map<Service, double> serviceMap = Map();
   Map<Item, double> itemMap = Map();
   Map<String, double> stationPricing = Map();
@@ -18,8 +20,12 @@ class StationCharge {
       this.leaseName,
       this.jobDate,
       this.notes,
+      this.billingField,
+      this.billingFieldName,
       this.serviceMap,
-      this.itemMap});
+      this.itemMap}) {
+    this.billingFieldName ??= '$billingField';
+  }
 
   String toJSONString(String path) {
     Map servs = Map();

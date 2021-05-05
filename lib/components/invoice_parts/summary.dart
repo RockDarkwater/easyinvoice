@@ -50,9 +50,7 @@ class InvoiceSummary extends StatelessWidget {
                     itemCount: job?.chargeSummary?.length ?? 0,
                     itemBuilder: (context, index) {
                       return Container(
-                        color: (index % 2 != 0)
-                            ? Colors.black12
-                            : Colors.orange[50],
+                        color: (index % 2 != 0) ? Colors.black12 : Colors.white,
                         child: ListTile(
                             dense: true,
                             onTap: () {

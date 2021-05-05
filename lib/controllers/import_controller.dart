@@ -551,7 +551,7 @@ class ImportController extends GetxController {
                                   result: await controller
                                       .getCustomer(qry.docs[index].id));
                             },
-                            focusColor: Colors.white54,
+                            focusColor: Colors.white,
                           );
                         }),
                   ),
@@ -560,7 +560,7 @@ class ImportController extends GetxController {
             ),
             scrollable: true,
           ),
-          barrierColor: Colors.white70,
+          barrierColor: Colors.white,
         );
       } else {
         return await controller.getCustomer(qry.docs.first.id);
