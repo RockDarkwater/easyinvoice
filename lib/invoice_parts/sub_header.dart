@@ -1,9 +1,10 @@
-import 'package:easyinvoice/components/invoice_parts/customer_address.dart';
 import 'package:easyinvoice/controllers/ui_controller.dart';
 import 'package:easyinvoice/models/job.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+
+import 'customer_address.dart';
 
 class SubHeader extends StatelessWidget {
   final Job job;
@@ -60,19 +61,34 @@ class SubHeader extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('$invNum'),
-                Text('${DateFormat.yMd().format(DateTime.now())}'),
-                Text('Net 30'),
-                Text('${job.customer.custNum ?? ''}'),
-                Text('${job.poNumber ?? job.customer.poNum ?? ''}'),
-                Text(''),
-                Text('${job.techName ?? ''}'),
-                Text('${job.location ?? ''}'),
-              ],
+                    Text('$invNum'),
+                  ] +
+                  textValues(job),
             ),
           )
         ],
       ),
     );
+  }
+
+  List<Text> textValues(Job job) {
+    List<Text> list = [];
+    list.add(Text('${DateFormat.yMd().format(DateTime.now())}'));
+    list.add(Text('Net 30'));
+    list.add(Text('${job.customer.custNum}'));
+
+    if (job.poNumber == 'null') {
+      (job.customer.poNum == 'null') ? Text('') : Text('${job.customer.poNum}');
+    } else {
+      list.add(Text('${job.poNumber}'));
+    }
+
+    list.add(Text(''));
+
+    (job.techName == 'null') ? list.add(Text('')) : Text('${job.techName}');
+
+    (job.location == 'null') ? list.add(Text('')) : Text('${job.location}');
+
+    return list;
   }
 }

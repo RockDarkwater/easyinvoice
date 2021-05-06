@@ -8,6 +8,7 @@ import 'package:get/get.dart';
 class UIController extends GetxController {
   final invView = false.obs;
   final currentJob = Job().obs;
+  final currentJobNum = 0.obs;
   final currentJobs = <Job>[].obs;
   final screenSize = Size(0, 0).obs;
   final invWidth = 0.0.obs;
@@ -26,13 +27,34 @@ class UIController extends GetxController {
     fontWeight: FontWeight.w700,
   );
   final invoiceTextStyle = TextStyle(
-    fontSize: 16,
-    fontWeight: FontWeight.w200,
+    fontSize: 12,
   );
+  final smallInvoiceTextStyle = TextStyle(
+    fontSize: 12,
+  );
+
+  moveNextJob({bool backward = false}) {
+    //increment index number in current jobs
+    print('Moving Jobs');
+    if (backward) {
+      (currentJobNum.value > 0)
+          ? currentJobNum.value--
+          : currentJobNum.value = currentJobs.length - 1;
+    } else {
+      (currentJobNum.value < currentJobs.length - 1)
+          ? currentJobNum.value++
+          : currentJobNum.value = 0;
+    }
+
+    currentJob.value = currentJobs[currentJobNum.value];
+  }
 
   setSizes(BuildContext context) {
     screenSize.value = MediaQuery.of(context).size;
+
     invWidth.value = screenSize.value.height * 8.5 / 11;
+    print(
+        'Screen Width: ${screenSize.value.width}, Invoice Width: ${invWidth.value.toInt()}');
   }
 
   double roundTo(double value, int decimalPlaces) {

@@ -57,7 +57,9 @@ class StationCharge {
     Map<String, dynamic> map = Map();
 
     map['Name'] = leaseName;
-    map['Number'] = leaseNumber;
+    (leaseNumber == 'null')
+        ? map['Number'] = ''
+        : map['Number'] = leaseNumber ?? '';
     map['Date'] = DateFormat.yMd().format(jobDate);
     serviceMap.forEach((key, value) {
       map['${key.name}'] = key.price * value;

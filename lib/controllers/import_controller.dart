@@ -416,6 +416,7 @@ class ImportController extends GetxController {
       stationCharges: stationCharges,
       chargeSummary: summaryMap,
     ));
+    // print(jobs.last.toJSONString());
   }
 
   Future<bool> checkExist(String collection, String docID) async {

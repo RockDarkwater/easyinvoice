@@ -12,7 +12,7 @@ class LoadingScreen extends StatelessWidget {
       child: Container(
         height: MediaQuery.of(context).size.height / 2,
         width: MediaQuery.of(context).size.width / 3,
-        color: Colors.white,
+        color: Colors.grey[50],
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,

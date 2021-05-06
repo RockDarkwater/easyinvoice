@@ -32,10 +32,13 @@ class StationCharges extends StatelessWidget {
               ),
               Padding(
                 padding: const EdgeInsets.only(top: 4.0, bottom: 2.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: chargeBody(),
+                child: FittedBox(
+                  fit: BoxFit.fitWidth,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: chargeBody(),
+                  ),
                 ),
               ),
             ]),

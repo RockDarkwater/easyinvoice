@@ -21,7 +21,7 @@ class ImportingScreen extends StatelessWidget {
         title: Text("EasyInvoice"),
       ),
       body: FutureBuilder(
-        future: testJob(), //controller.import(), //
+        future: controller.import(), //testJob(), //
         builder: (context, snapshot) {
           if (snapshot.connectionState != ConnectionState.done) {
             controller.importQty.value = 1;
