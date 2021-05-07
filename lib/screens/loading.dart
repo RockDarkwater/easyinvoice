@@ -27,15 +27,14 @@ class LoadingScreen extends StatelessWidget {
                     child: Text(
                       'Loading ...',
                       textAlign: TextAlign.center,
-                      style: TextStyle(color: Colors.deepOrange, fontSize: 42),
+                      style: TextStyle(color: Colors.grey[900], fontSize: 42),
                     ),
                   ),
                   Obx(() => Text(
                         '${controller.resultNames[controller.currentImport.value]}',
                         textAlign: TextAlign.center,
                         softWrap: true,
-                        style:
-                            TextStyle(color: Colors.deepOrange, fontSize: 14),
+                        style: TextStyle(color: Colors.grey[900], fontSize: 14),
                       )),
                 ],
               ),
@@ -47,7 +46,7 @@ class LoadingScreen extends StatelessWidget {
                         controller.processQty.value),
                     valueColor:
                         AlwaysStoppedAnimation<Color>(Colors.deepOrange),
-                    backgroundColor: Colors.orange,
+                    backgroundColor: Colors.grey[800],
                   )),
               Obx(() => Text(
                     'Stations: ${controller.currentProcess.value} / ${controller.processQty.value}',
@@ -66,7 +65,7 @@ class LoadingScreen extends StatelessWidget {
                         controller.importQty.value),
                     valueColor:
                         AlwaysStoppedAnimation<Color>(Colors.deepOrange),
-                    backgroundColor: Colors.orange,
+                    backgroundColor: Colors.grey[800],
                   )),
               Obx(() => Text(
                     'Imports: ${controller.currentImport.value} / ${controller.importQty.value}',

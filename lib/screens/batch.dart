@@ -15,7 +15,7 @@ class BatchScreen extends StatelessWidget {
   void bounceBack() {
     print('Tapped on Upload');
     if (controller.parents.length > 0) {
-      Get.off(() => UploadScreen(), transition: Transition.noTransition);
+      Get.offAll(() => UploadScreen(), transition: Transition.noTransition);
     }
   }
 
@@ -63,53 +63,69 @@ class BatchScreen extends StatelessWidget {
                               itemCount: controller.parents.length,
                               scrollDirection: Axis.vertical,
                               itemBuilder: (context, index) {
-                                return ListTile(
-                                  title: Center(
-                                    child: Obx(() => Text(
-                                        'C - ${controller.parents.keys.toList()[index]}: ' +
-                                            '${controller.parents[controller.parents.keys.toList()[index]]} - ' +
-                                            '${controller.countCustCharges(controller.parents.keys.toList()[index])} items charged, Total: ' +
-                                            '${formatCurrency.format(controller.priceCustomer(controller.parents.keys.toList()[index]))}')),
-                                  ),
-                                  onTap: () {
-                                    //set current jobs to all jobs with the clicked parent.
-                                    uiController.currentJobs.assignAll(
-                                        controller.jobs.where((job) =>
-                                            job.customer.parentCustomer.keys
-                                                .first ==
-                                            controller.parents.keys
-                                                .toList()[index]));
-                                    //submit first job to invoice
-                                    uiController.currentJob.value =
-                                        uiController.currentJobs.first;
-                                    //set invoice view to true to rebuild view
-                                    uiController.invView.value = true;
-                                  },
-                                  tileColor: Colors.grey[200],
-                                  focusColor: Colors.grey,
-                                  hoverColor: Colors.white,
-                                  leading: TextButton(
-                                    onPressed: () {
-                                      controller.jobs.removeWhere((job) =>
-                                          job.customer.parentCustomer.keys
-                                              .first ==
-                                          controller.parents.keys
-                                              .toList()[index]);
+                                return Padding(
+                                  padding: const EdgeInsets.all(2.0),
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      boxShadow: [
+                                        BoxShadow(
+                                            color:
+                                                Colors.grey.withOpacity(0.2)),
+                                        BoxShadow(
+                                            blurRadius: 75,
+                                            color:
+                                                Colors.grey.withOpacity(0.2)),
+                                      ],
+                                    ),
+                                    child: ListTile(
+                                      title: Center(
+                                        child: Obx(() => Text(
+                                            'C - ${controller.parents.keys.toList()[index]}: ' +
+                                                '${controller.parents[controller.parents.keys.toList()[index]]} - ' +
+                                                '${controller.countCustCharges(controller.parents.keys.toList()[index])} items charged, Total: ' +
+                                                '${formatCurrency.format(controller.priceCustomer(controller.parents.keys.toList()[index]))}')),
+                                      ),
+                                      onTap: () {
+                                        //set current jobs to all jobs with the clicked parent.
+                                        uiController.currentJobs.assignAll(
+                                            controller.jobs.where((job) =>
+                                                job.customer.parentCustomer.keys
+                                                    .first ==
+                                                controller.parents.keys
+                                                    .toList()[index]));
+                                        //submit first job to invoice
+                                        uiController.currentJob.value =
+                                            uiController.currentJobs.first;
+                                        //set invoice view to true to rebuild view
+                                        uiController.invView.value = true;
+                                      },
+                                      tileColor: Colors.grey[200],
+                                      focusColor: Colors.grey,
+                                      hoverColor: Colors.white,
+                                      leading: TextButton(
+                                        onPressed: () {
+                                          controller.jobs.removeWhere((job) =>
+                                              job.customer.parentCustomer.keys
+                                                  .first ==
+                                              controller.parents.keys
+                                                  .toList()[index]);
 
-                                      if (controller.jobs.length == 0) {
-                                        Get.back();
-                                        controller.currentImport.value = 1;
-                                        controller.importQty.value = 1;
-                                        controller.processQty.value = 1;
-                                        controller.currentProcess.value = 1;
-                                        controller.resultNames.clear();
-                                        controller.resultNames.add('');
-                                        controller.parents.clear();
-                                      } else {
-                                        controller.compileParents();
-                                      }
-                                    },
-                                    child: Icon(Icons.remove),
+                                          if (controller.jobs.length == 0) {
+                                            Get.back();
+                                            controller.currentImport.value = 1;
+                                            controller.importQty.value = 1;
+                                            controller.processQty.value = 1;
+                                            controller.currentProcess.value = 1;
+                                            controller.resultNames.clear();
+                                            controller.resultNames.add('');
+                                            controller.parents.clear();
+                                          } else {
+                                            controller.compileParents();
+                                          }
+                                        },
+                                        child: Icon(Icons.remove),
+                                      ),
+                                    ),
                                   ),
                                 );
                               },

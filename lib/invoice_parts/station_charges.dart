@@ -61,7 +61,7 @@ class StationCharges extends StatelessWidget {
       list = [];
       list.add(Padding(
         padding: const EdgeInsets.all(8.0),
-        child: Text('${header.split(' ')[0]}'),
+        child: Text('$header'),
       ));
 
       job.stationCharges.forEach((charge) {

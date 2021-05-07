@@ -17,8 +17,6 @@ class Invoice extends StatelessWidget {
   Invoice(this.job);
 
   Widget build(BuildContext context) {
-    double arrowWidth =
-        (uiController.screenSize.value.width - uiController.invWidth.value) / 4;
     return Container(
       child: Stack(
         children: [
@@ -43,27 +41,32 @@ class Invoice extends StatelessWidget {
                             uiController.moveNextJob(backward: true);
                           }
                         },
-                        child: Container(
-                          height: arrowWidth,
-                          width: arrowWidth,
-                          decoration: BoxDecoration(boxShadow: [
-                            BoxShadow(
-                                blurRadius: 40,
-                                spreadRadius: 10,
-                                color: Colors.grey.withOpacity(.5))
-                          ]),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(
-                                Icons.arrow_back_ios_rounded,
-                                size: uiController.screenSize.value.width / 25,
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Text('Previous'),
-                              ),
-                            ],
+                        child: FittedBox(
+                          child: Container(
+                            decoration: BoxDecoration(boxShadow: [
+                              BoxShadow(
+                                  blurRadius: 20,
+                                  offset: Offset(0, -3),
+                                  color: Colors.grey.withOpacity(0.3)),
+                              BoxShadow(
+                                  blurRadius: 40,
+                                  spreadRadius: 10,
+                                  color: Colors.grey.withOpacity(.5))
+                            ]),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  Icons.arrow_back_ios_rounded,
+                                  size:
+                                      uiController.screenSize.value.width / 25,
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Text('Previous'),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       ),
@@ -73,20 +76,19 @@ class Invoice extends StatelessWidget {
               ),
               Padding(
                 padding: const EdgeInsets.only(left: 25, right: 25.0),
-                child: SingleChildScrollView(
-                    controller: ScrollController(),
-                    child: Container(
-                      padding:
-                          EdgeInsets.all(uiController.invWidth.value * 3 / 100),
-                      decoration:
-                          BoxDecoration(color: Colors.white, boxShadow: [
-                        BoxShadow(
-                          spreadRadius: 2,
-                          blurRadius: 40,
-                          color: Colors.grey,
-                          offset: Offset(1, 5),
-                        ),
-                      ]),
+                child: Container(
+                    padding:
+                        EdgeInsets.all(uiController.invWidth.value * 3 / 100),
+                    decoration: BoxDecoration(color: Colors.white, boxShadow: [
+                      BoxShadow(
+                        spreadRadius: 2,
+                        blurRadius: 40,
+                        color: Colors.grey,
+                        offset: Offset(1, 5),
+                      ),
+                    ]),
+                    child: SingleChildScrollView(
+                      controller: ScrollController(),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -119,27 +121,32 @@ class Invoice extends StatelessWidget {
                             uiController.moveNextJob(backward: false);
                           }
                         },
-                        child: Container(
-                          height: arrowWidth,
-                          width: arrowWidth,
-                          decoration: BoxDecoration(boxShadow: [
-                            BoxShadow(
-                                blurRadius: 40,
-                                spreadRadius: 10,
-                                color: Colors.grey.withOpacity(.5))
-                          ]),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(
-                                Icons.arrow_forward_ios_rounded,
-                                size: uiController.screenSize.value.width / 25,
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Text('Next'),
-                              ),
-                            ],
+                        child: FittedBox(
+                          child: Container(
+                            decoration: BoxDecoration(boxShadow: [
+                              BoxShadow(
+                                  blurRadius: 20,
+                                  offset: Offset(0, -3),
+                                  color: Colors.grey.withOpacity(0.3)),
+                              BoxShadow(
+                                  blurRadius: 40,
+                                  spreadRadius: 10,
+                                  color: Colors.grey.withOpacity(.5))
+                            ]),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  Icons.arrow_forward_ios_rounded,
+                                  size:
+                                      uiController.screenSize.value.width / 25,
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Text('Next'),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       ),

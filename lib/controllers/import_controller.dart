@@ -21,6 +21,8 @@ class ImportController extends GetxController {
   RxInt currentProcess = 1.obs;
   RxList<String> resultNames = <String>[''].obs;
 
+  applyRules() {}
+
   double countCustCharges(int custId) {
     double total = 0;
     jobs
@@ -43,6 +45,7 @@ class ImportController extends GetxController {
 
   compileParents() {
     int parentNum;
+    parents.clear();
     jobs.forEach((job) {
       parentNum = job.customer.parentCustomer.keys.first;
       parents.putIfAbsent(
@@ -55,7 +58,7 @@ class ImportController extends GetxController {
     FilePickerResult result =
         await FilePicker.platform.pickFiles(allowMultiple: true);
 
-    resultNames.insertAll(0, result.names);
+    resultNames.replaceRange(0, resultNames.length - 1, result.names);
     List<List<String>> txtFile;
     List<String> rows;
     Excel book;

@@ -41,7 +41,7 @@ class FireBaseController extends GetxController {
           ruleField: ruleDoc.data()['ruleField'],
           ruleValue: ruleDoc.data()['ruleValue'],
         );
-        print('${rule.toString()}');
+        // print('${rule.toString()}');
         list.add(rule);
       });
     }

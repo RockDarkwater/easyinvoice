@@ -54,9 +54,11 @@ class App extends StatelessWidget {
           return GetMaterialApp(
             title: 'Flutter Demo',
             theme: ThemeData(
-                primarySwatch: Colors.deepOrange,
-                primaryColor: Colors.orange,
-                accentColor: Colors.white,
+                primarySwatch:
+                    uiController.createMaterialColor(Colors.grey[800]),
+                primaryColor:
+                    uiController.createMaterialColor(Colors.grey[800]),
+                accentColor: Colors.orange[600],
                 primaryTextTheme: uiController.textTheme),
             home: UploadScreen(),
           );

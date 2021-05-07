@@ -13,7 +13,6 @@ class InvoiceSummary extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Size screen = MediaQuery.of(context).size;
     return Container(
       width: uiController.invWidth.value,
       child: Column(
@@ -109,11 +108,12 @@ class InvoiceSummary extends StatelessWidget {
                   color: Colors.black,
                 ),
                 Padding(
-                  padding: EdgeInsets.only(left: screen.width / 3),
+                  padding: EdgeInsets.only(left: uiController.invWidth / 2),
                   child: Align(
                     alignment: Alignment.centerRight,
                     child: Padding(
-                      padding: EdgeInsets.only(right: screen.width / 10),
+                      padding:
+                          EdgeInsets.only(right: uiController.invWidth / 10),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.start,
                         mainAxisSize: MainAxisSize.min,
@@ -130,16 +130,18 @@ class InvoiceSummary extends StatelessWidget {
                   ),
                 ),
                 Divider(
-                  indent: screen.width / 2.5,
-                  endIndent: screen.width / 25,
+                  indent: uiController.invWidth / 1.5,
+                  endIndent: uiController.invWidth / 25,
                   color: Colors.black,
                 ),
                 Padding(
-                  padding: EdgeInsets.only(left: screen.width / 3, bottom: 8.0),
+                  padding: EdgeInsets.only(
+                      left: uiController.invWidth / 2, bottom: 8.0),
                   child: Align(
                       alignment: Alignment.centerRight,
                       child: Padding(
-                        padding: EdgeInsets.only(right: screen.width / 10),
+                        padding:
+                            EdgeInsets.only(right: uiController.invWidth / 10),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.start,
                           mainAxisSize: MainAxisSize.min,

@@ -17,7 +17,10 @@ class UploadScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        title: Text('EasyInvoice'),
+        title: Text(
+          'EasyInvoice',
+          style: uiController.textTheme.headline1,
+        ),
       ),
       body: Center(
         child: Stack(
@@ -31,7 +34,10 @@ class UploadScreen extends StatelessWidget {
                         () => Scaffold(
                             appBar: AppBar(
                               centerTitle: true,
-                              title: Text('EasyInvoice'),
+                              title: Text(
+                                'EasyInvoice',
+                                style: uiController.textTheme.headline1,
+                              ),
                             ),
                             body: BatchScreen()),
                         transition: Transition.noTransition);
@@ -48,12 +54,13 @@ class UploadScreen extends StatelessWidget {
                   border: Border.all(
                       width: 10.0,
                       style: BorderStyle.solid,
-                      color: Colors.orange)),
+                      color: Colors.grey[800])),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
                   Text(
                     'Click the button to upload files:',
+                    style: uiController.textTheme.bodyText1,
                   ),
                   Padding(
                     padding: const EdgeInsets.only(top: 15.0),
@@ -65,8 +72,9 @@ class UploadScreen extends StatelessWidget {
                             transition: Transition.noTransition);
                         // await controller.import();
                       },
-                      tooltip: 'Increment',
-                      child: Icon(Icons.add),
+                      child: Icon(
+                        Icons.add,
+                      ),
                     ),
                   ),
                 ],

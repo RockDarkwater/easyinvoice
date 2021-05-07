@@ -18,12 +18,16 @@ class ImportingScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        title: Text("EasyInvoice"),
+        title: Text(
+          "EasyInvoice",
+          style: uiController.textTheme.headline1,
+        ),
       ),
       body: FutureBuilder(
-        future: controller.import(), //testJob(), //
+        future: testJob(), // controller.import(), //
         builder: (context, snapshot) {
-          if (snapshot.connectionState != ConnectionState.done) {
+          print(snapshot.connectionState.toString());
+          while (snapshot.connectionState != ConnectionState.done) {
             controller.importQty.value = 1;
             controller.currentImport.value = 0;
             controller.currentProcess.value = 0;
@@ -31,10 +35,9 @@ class ImportingScreen extends StatelessWidget {
 
             //Loading Process Screen
             return LoadingScreen();
-          } else {
-            //Batch Screen
-            return BatchScreen();
           }
+          //Batch Screen
+          return BatchScreen();
         },
       ),
     );

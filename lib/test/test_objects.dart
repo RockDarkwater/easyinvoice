@@ -54,5 +54,46 @@ Future<void> testJob() async {
         plate: 2
       }));
   controller.jobs.last.priceServices();
+
+  cust = await controller.parseCustomer('250');
+
+  controller.jobs.add(Job(
+      customer: cust,
+      poNumber: '101020301',
+      location: 'Your other house',
+      requisitioner: 'Another guy',
+      techName: 'Jim Hortons',
+      stationCharges: [
+        StationCharge(
+            leaseName: 'Test Lease 2',
+            leaseNumber: '22233',
+            jobDate: DateTime(2021, 4, 15),
+            serviceMap: {
+              cal: 1,
+              gas: 1,
+              liquid: 6,
+            },
+            itemMap: {
+              plate: 2
+            }),
+        StationCharge(
+          leaseName: 'Test Lease 5',
+          leaseNumber: '556677',
+          jobDate: DateTime(2021, 4, 7),
+          serviceMap: {
+            cal: 1,
+            gas: 3,
+          },
+          itemMap: {},
+        ),
+      ],
+      chargeSummary: {
+        cal: 2,
+        gas: 4,
+        liquid: 6,
+        plate: 2
+      }));
+  controller.jobs.last.priceServices();
+
   controller.compileParents();
 }
