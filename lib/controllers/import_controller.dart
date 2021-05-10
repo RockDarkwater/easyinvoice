@@ -21,7 +21,26 @@ class ImportController extends GetxController {
   RxInt currentProcess = 1.obs;
   RxList<String> resultNames = <String>[''].obs;
 
-  applyRules() {}
+  applyRules() {
+    //loop through jobs
+    int totalJobs = jobs.length;
+    int i = 0;
+    var json;
+    print('applying rules');
+    for (i = 0; i < totalJobs; i++) {
+      print('$i out of $totalJobs');
+      print('${jobs[i].customer.rules.toString()}');
+
+      print(json.toString());
+      jobs[i].customer.rules.forEach((rule) {
+        if (json[rule.boolField] == rule.boolValue) {
+          print('testing ${rule.boolField} does equal ${rule.boolValue}');
+        }
+      });
+    }
+    //for each rule on a customer, test boolean and if true apply fix
+    //recalculate?
+  }
 
   double countCustCharges(int custId) {
     double total = 0;
@@ -98,10 +117,11 @@ class ImportController extends GetxController {
         print('${result.files[i].name} is not text or excel');
       }
     }
+    compileParents();
     jobs.forEach((job) {
       job.priceServices();
     });
-    compileParents();
+    applyRules();
   }
 
   Future<void> buildAmisJobs(List<List<String>> data, String date) async {

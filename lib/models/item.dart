@@ -1,4 +1,7 @@
+import 'package:flutter/material.dart';
+
 class Item {
+  final UniqueKey key = UniqueKey();
   final bool isItem = true;
   final String itemCode;
   final String name;
@@ -8,13 +11,17 @@ class Item {
 
   Item({this.itemCode, this.name, this.price, this.cost});
 
-  String toJSONString(String path) {
-    Map map = {
-      '$path.isItem': isItem,
-      '$path.itemCode': itemCode,
-      '$path.name': name,
-      '$path.taxable': taxable,
-    };
-    return map.toString();
-  }
+  Item.fromJson(Map<String, dynamic> json)
+      : itemCode = json['itemCode'],
+        name = json['name'],
+        price = json['price'],
+        cost = json['cost'];
+
+  Map<String, dynamic> toJSON() => {
+        'price': price,
+        'cost': cost,
+        'itemCode': itemCode,
+        'name': name,
+        'taxable': taxable,
+      };
 }

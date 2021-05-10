@@ -2,9 +2,10 @@ import 'dart:math';
 
 import 'package:easyinvoice/models/item.dart';
 import 'package:easyinvoice/models/service.dart';
-import 'package:intl/intl.dart';
+import 'package:flutter/material.dart';
 
 class StationCharge {
+  UniqueKey key = UniqueKey();
   String leaseName;
   String leaseNumber;
   DateTime jobDate;
@@ -24,49 +25,40 @@ class StationCharge {
       this.billingFieldName,
       this.serviceMap,
       this.itemMap}) {
+    key ??= UniqueKey();
     this.billingFieldName ??= '$billingField';
   }
+  StationCharge.fromJson(Map<String, dynamic> json)
+      : key = json['key'],
+        leaseNumber = json['leaseNumber'],
+        leaseName = json['leaseName'],
+        jobDate = json['jobDate'],
+        notes = json['notes'],
+        billingField = json['billingField'],
+        billingFieldName = json['billingFieldName'],
+        serviceMap = Map.fromIterable(json['serviceMap'],
+            key: (key) => Service.fromJson(key),
+            value: (value) => double.tryParse(value)),
+        itemMap = Map.fromIterable(json['itemMap'],
+            key: (key) => Item.fromJson(key),
+            value: (value) => double.tryParse(value)),
+        stationPricing = Map.fromIterable(json['stationPricing'],
+            value: (value) => double.tryParse(value));
 
-  String toJSONString(String path) {
-    Map servs = Map();
-    Map items = Map();
-    int i = 0;
-    serviceMap.forEach((key, value) {
-      servs['$path.${key.toJSONString("$path.serviceMap.$i")}'] = value;
-      i++;
-    });
-    i = 0;
-    itemMap.forEach((key, value) {
-      items['$path.${key.toJSONString("$path.itemMap.$i")}'] = value;
-      i++;
-    });
-
-    Map map = {
-      '$path.leaseName': leaseName,
-      '$path.leaseNumber': leaseNumber,
-      '$path.jobDate': jobDate,
-      '$path.notes': notes,
-      '$path.serviceMap': servs.toString(),
-      '$path.itemMap': items.toString(),
-    };
-
-    return map.toString();
-  }
-
-  Map<String, dynamic> toJson() {
-    Map<String, dynamic> map = Map();
-
-    map['Name'] = leaseName;
-    (leaseNumber == 'null')
-        ? map['Number'] = ''
-        : map['Number'] = leaseNumber ?? '';
-    map['Date'] = DateFormat.yMd().format(jobDate);
-    serviceMap.forEach((key, value) {
-      map['${key.name}'] = key.price * value;
-    });
-
-    return map;
-  }
+  Map<String, dynamic> toJson() => {
+        'key': key,
+        'leaseName': leaseName,
+        'leaseNumber': leaseNumber,
+        'jobDate': jobDate,
+        'notes': notes,
+        'billingField': billingField,
+        'billingFieldName': billingFieldName,
+        'serviceMap':
+            Map.fromIterable(serviceMap.entries, key: (key) => key.toJson()),
+        'itemMap':
+            Map.fromIterable(itemMap.entries, key: (key) => key.toJson()),
+        'stationPricing': stationPricing,
+      };
 
   double partCost() {
     double cost = 0;

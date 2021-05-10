@@ -1,6 +1,8 @@
 import 'package:easyinvoice/models/rule.dart';
+import 'package:flutter/cupertino.dart';
 
 class Customer {
+  final UniqueKey key = UniqueKey();
   final String custNum;
   final SubmitOption primarySubmit;
   final String billingName;
@@ -45,29 +47,51 @@ class Customer {
       this.ccFee,
       this.rules});
 
-  String toJSONString(String path) {
-    Map map = {
-      '$path.custNum': custNum,
-      '$path.primarySubmit': primarySubmit.toString(),
-      '$path.billingName': billingName,
-      '$path.parentCustomer': parentCustomer,
-      '$path.add1': add1,
-      '$path.add2': add2,
-      '$path.add3': add3,
-      '$path.secondarySubmit': secondarySubmit.toString(),
-      '$path.city': city,
-      '$path.state': state,
-      '$path.zip': zip,
-      '$path.custClass': custClass,
-      '$path.distList': distList,
-      '$path.fieldArea': fieldArea,
-      '$path.poNum': poNum,
-      '$path.requisitioner': requisitioner,
-      '$path.taxRate': taxRate,
-      '$path.ccFee': ccFee
-    };
-    return map.toString();
-  }
+  Customer.fromJson(Map<String, dynamic> json)
+      : custNum = json['custNum'],
+        billingName = json['billingName'],
+        primarySubmit = SubmitOption.values.elementAt(json['primarySubmit']),
+        priceMap = json['priceMap'],
+        parentCustomer = json['parentCustomer'],
+        add1 = json['add1'],
+        add2 = json['add2'],
+        add3 = json['add3'],
+        city = json['city'],
+        state = json['state'],
+        zip = json['zip'],
+        secondarySubmit =
+            SubmitOption.values.elementAt(json['secondarySubmit']),
+        custClass = json['custClass'],
+        distList = json['distList'],
+        fieldArea = json['fieldArea'],
+        poNum = json['poNum'],
+        requisitioner = json['requisitioner'],
+        taxRate = json['taxRate'],
+        ccFee = json['ccFee'],
+        rules = json['rules'];
+
+  Map<String, dynamic> toJson() => {
+        'custNum': custNum,
+        'billingName': billingName,
+        'primarySubmit': primarySubmit.index,
+        'secondarySubmit': secondarySubmit.index,
+        'parentCustomer': parentCustomer,
+        'add1': add1,
+        'add2': add2,
+        'add3': add3,
+        'city': city,
+        'state': state,
+        'zip': zip,
+        'custClass': custClass,
+        'distList': distList,
+        'fieldArea': fieldArea,
+        'poNum': poNum,
+        'requisitioner': requisitioner,
+        'taxRate': taxRate,
+        'ccFee': ccFee,
+        'rules': rules,
+        'pri`ceMap': priceMap,
+      };
 }
 
 enum SubmitOption { email, mail, openinvoice, ariba, none }

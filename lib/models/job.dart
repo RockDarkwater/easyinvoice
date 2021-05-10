@@ -1,12 +1,15 @@
+import 'dart:convert';
 import 'dart:math';
 
 import 'package:easyinvoice/models/customer.dart';
 import 'package:easyinvoice/models/item.dart';
 import 'package:easyinvoice/models/service.dart';
 import 'package:easyinvoice/models/station_charge.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:intl/intl.dart';
 
 class Job {
+  final UniqueKey key = UniqueKey();
   Customer customer;
   String techName;
   String poNumber;
@@ -24,27 +27,34 @@ class Job {
       this.stationCharges,
       this.chargeSummary});
 
-  String toJSONString() {
-    Map statChg = Map();
-    int i = 0;
-    stationCharges.forEach((element) {
-      statChg.putIfAbsent(
-          statChg.length, () => element.toJSONString('stationCharge.$i'));
-      i++;
-    });
-
-    Map map = {
-      'customer': customer.toJSONString('customer'),
-      'techName': techName,
-      'poNumber': poNumber,
-      'requisitioner': requisitioner,
-      'location': location,
-      'stationCharges': statChg.toString(),
-      'totalStations': stationCharges.length,
-    };
-
-    return map.toString();
+  Job.fromJson(Map<String, dynamic> json) {
+    customer = Customer.fromJson(json['customer']);
+    techName = json['techName'];
+    poNumber = json['poNumber'];
+    requisitioner = json['requisitioner'];
+    location = json['location'];
+    stationCharges = jsonDecode(json['stationCharges']);
+    chargeSummary.addAll(
+      Map.fromIterable(json['chargeSummary'],
+          key: (key) => {
+                (key.contains('isItem:true'))
+                    ? Item.fromJson(key)
+                    : Service.fromJson(key)
+              },
+          value: (value) => double.tryParse(value)),
+    );
   }
+  Map<String, dynamic> toJson() => {
+        'key': key,
+        'customer': customer.toJson(),
+        'techName': techName,
+        'poNumber': poNumber,
+        'requisitioner': requisitioner,
+        'location': location,
+        'stationCharges': jsonEncode(stationCharges),
+        'chargeSummary':
+            Map.fromIterable(chargeSummary.entries, key: (key) => key.toJson()),
+      };
 
   String dateSpan() {
     DateTime minDate = DateTime(3500, 1, 1);

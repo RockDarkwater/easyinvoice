@@ -1,4 +1,7 @@
+import 'package:flutter/cupertino.dart';
+
 class Service {
+  UniqueKey key = UniqueKey();
   final bool isItem = false;
   final String serviceCode;
   final String name;
@@ -15,18 +18,28 @@ class Service {
       this.category,
       this.workUnits,
       this.price,
-      this.taxable});
-
-  String toJSONString(String path) {
-    Map map = {
-      '$path.isItem': isItem,
-      '$path.serviceCode': serviceCode,
-      '$path.name': name,
-      '$path.qbName': qbName,
-      '$path.category': category,
-      '$path.workUnits': workUnits,
-      '$path.taxable': taxable,
-    };
-    return map.toString();
+      this.taxable}) {
+    key ??= UniqueKey();
   }
+
+  Service.fromJson(Map<String, dynamic> json)
+      : key = json['key'],
+        serviceCode = json['serviceCode'],
+        name = json['name'],
+        qbName = json['qbName'],
+        category = json['category'],
+        workUnits = json['workUnits'],
+        price = json['price'];
+
+  Map<String, dynamic> toJson() => {
+        'key': key,
+        'isItem': isItem,
+        'serviceCode': serviceCode,
+        'name': name,
+        'qbName': qbName,
+        'category': category,
+        'workUnits': workUnits,
+        'price': price,
+        'taxable': taxable,
+      };
 }
