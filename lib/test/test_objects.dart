@@ -97,4 +97,11 @@ Future<void> testJob() async {
   controller.compileParents();
   controller.jobs.forEach((job) => job.priceServices());
   controller.applyRules();
+
+  Job test = Job.fromJson(controller.jobs.first.toJson());
+  try {
+    print(test.toJson());
+  } catch (err) {
+    print('$err');
+  }
 }

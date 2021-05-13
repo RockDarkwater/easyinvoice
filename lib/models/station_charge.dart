@@ -2,10 +2,8 @@ import 'dart:math';
 
 import 'package:easyinvoice/models/item.dart';
 import 'package:easyinvoice/models/service.dart';
-import 'package:flutter/material.dart';
 
 class StationCharge {
-  UniqueKey key = UniqueKey();
   String leaseName;
   String leaseNumber;
   DateTime jobDate;
@@ -14,7 +12,6 @@ class StationCharge {
   String billingFieldName;
   Map<Service, double> serviceMap = Map();
   Map<Item, double> itemMap = Map();
-  Map<String, double> stationPricing = Map();
 
   StationCharge(
       {this.leaseNumber,
@@ -25,39 +22,43 @@ class StationCharge {
       this.billingFieldName,
       this.serviceMap,
       this.itemMap}) {
-    key ??= UniqueKey();
     this.billingFieldName ??= '$billingField';
   }
   StationCharge.fromJson(Map<String, dynamic> json)
-      : key = json['key'],
-        leaseNumber = json['leaseNumber'],
+      : leaseNumber = json['leaseNumber'],
         leaseName = json['leaseName'],
         jobDate = json['jobDate'],
         notes = json['notes'],
         billingField = json['billingField'],
         billingFieldName = json['billingFieldName'],
-        serviceMap = Map.fromIterable(json['serviceMap'],
-            key: (key) => Service.fromJson(key),
-            value: (value) => double.tryParse(value)),
-        itemMap = Map.fromIterable(json['itemMap'],
-            key: (key) => Item.fromJson(key),
-            value: (value) => double.tryParse(value)),
-        stationPricing = Map.fromIterable(json['stationPricing'],
-            value: (value) => double.tryParse(value));
+        serviceMap = Map.fromIterables(
+            List.generate(
+                Map.from(json['serviceMap']).length,
+                (index) => Service.fromJson(
+                    Map.from(json['serviceMap']).keys.toList()[index])),
+            List.from(Map.from(json['serviceMap']).values)),
+        itemMap = Map.fromIterables(
+            List.generate(
+                Map.from(json['itemMap']).length,
+                (index) => Item.fromJson(
+                    Map.from(json['itemMap']).keys.toList()[index])),
+            List.from(Map.from(json['itemMap']).values));
 
   Map<String, dynamic> toJson() => {
-        'key': key,
         'leaseName': leaseName,
         'leaseNumber': leaseNumber,
         'jobDate': jobDate,
         'notes': notes,
         'billingField': billingField,
         'billingFieldName': billingFieldName,
-        'serviceMap':
-            Map.fromIterable(serviceMap.entries, key: (key) => key.toJson()),
-        'itemMap':
-            Map.fromIterable(itemMap.entries, key: (key) => key.toJson()),
-        'stationPricing': stationPricing,
+        'serviceMap': Map.fromIterables(
+            List.generate(serviceMap.length,
+                (index) => serviceMap.keys.toList()[index].toJson()),
+            List.from(serviceMap.values)),
+        'itemMap': Map.fromIterables(
+            List.generate(itemMap.length,
+                (index) => itemMap.keys.toList()[index].toJson()),
+            List.from(itemMap.values)),
       };
 
   double partCost() {

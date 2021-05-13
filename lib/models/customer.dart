@@ -90,7 +90,7 @@ class Customer {
         'taxRate': taxRate,
         'ccFee': ccFee,
         'rules': rules,
-        'pri`ceMap': priceMap,
+        'priceMap': priceMap,
       };
 }
 

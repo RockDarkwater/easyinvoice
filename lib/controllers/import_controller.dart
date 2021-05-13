@@ -25,21 +25,37 @@ class ImportController extends GetxController {
     //loop through jobs
     int totalJobs = jobs.length;
     int i = 0;
-    var json;
+
     print('applying rules');
     for (i = 0; i < totalJobs; i++) {
       print('$i out of $totalJobs');
-      print('${jobs[i].customer.rules.toString()}');
+      print('jobs${jobs[i].customer.rules.length}');
 
-      print(json.toString());
-      jobs[i].customer.rules.forEach((rule) {
-        if (json[rule.boolField] == rule.boolValue) {
-          print('testing ${rule.boolField} does equal ${rule.boolValue}');
-        }
-      });
+      // if job customer has a rule
+      if (jobs[i].customer.rules.length > 0) {
+        // convert job to json map
+        // jobs[i].customer.rules.forEach((rule) {
+        //   var json = List.generate(jobs[i].stationCharges.length,
+        //       (ind) => jobs[i].stationCharges[ind].toJson());
+        //   print(json);
+        //     Map custJson = Map.from(json['customer']);
+        //     Map stationJson = Map.from(json['stationCharges']);
+        //     Map chargeJson = Map.from(json['chargeSummary']);
+        //     // check rule test
+        //     if (json.containsKey(rule.boolField)) print(json.toString());
+        //     if (custJson.containsKey(rule.boolField)) print(custJson.toString());
+        //     if (stationJson.containsKey(rule.boolField))
+        //       print(stationJson.toString());
+        //     if (chargeJson.containsKey(rule.boolField))
+        //       print(chargeJson.toString());
+        // });
+      }
+      //convert job to json
+
+      //edit job
+
+      //replace job with job from edited json
     }
-    //for each rule on a customer, test boolean and if true apply fix
-    //recalculate?
   }
 
   double countCustCharges(int custId) {

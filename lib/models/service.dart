@@ -1,7 +1,4 @@
-import 'package:flutter/cupertino.dart';
-
 class Service {
-  UniqueKey key = UniqueKey();
   final bool isItem = false;
   final String serviceCode;
   final String name;
@@ -18,21 +15,18 @@ class Service {
       this.category,
       this.workUnits,
       this.price,
-      this.taxable}) {
-    key ??= UniqueKey();
-  }
+      this.taxable});
 
   Service.fromJson(Map<String, dynamic> json)
-      : key = json['key'],
-        serviceCode = json['serviceCode'],
+      : serviceCode = json['serviceCode'],
         name = json['name'],
         qbName = json['qbName'],
         category = json['category'],
         workUnits = json['workUnits'],
-        price = json['price'];
+        price = json['price'],
+        taxable = json['taxable'];
 
   Map<String, dynamic> toJson() => {
-        'key': key,
         'isItem': isItem,
         'serviceCode': serviceCode,
         'name': name,

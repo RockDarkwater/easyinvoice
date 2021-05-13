@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:math';
 
 import 'package:easyinvoice/models/customer.dart';
@@ -27,23 +26,28 @@ class Job {
       this.stationCharges,
       this.chargeSummary});
 
-  Job.fromJson(Map<String, dynamic> json) {
-    customer = Customer.fromJson(json['customer']);
-    techName = json['techName'];
-    poNumber = json['poNumber'];
-    requisitioner = json['requisitioner'];
-    location = json['location'];
-    stationCharges = jsonDecode(json['stationCharges']);
-    chargeSummary.addAll(
-      Map.fromIterable(json['chargeSummary'],
-          key: (key) => {
-                (key.contains('isItem:true'))
-                    ? Item.fromJson(key)
-                    : Service.fromJson(key)
-              },
-          value: (value) => double.tryParse(value)),
-    );
-  }
+  Job.fromJson(Map<String, dynamic> json)
+      : customer = Customer.fromJson(json['customer']),
+        techName = json['techName'],
+        poNumber = json['poNumber'],
+        requisitioner = json['requisitioner'],
+        location = json['location'],
+        stationCharges = List.generate(List.from(json['stationCharges']).length,
+            (index) => StationCharge.fromJson((json['stationCharges'][index]))),
+        chargeSummary = Map.fromIterables(
+            List.generate(Map.from(json['chargeSummary']).length, (ind) {
+              var thing = Map.from(json['chargeSummary']).keys.toList()[ind];
+              // print(thing.toString());
+              if (thing.toString().indexOf("isItem: false") > -1) {
+                //parse service
+                return Service.fromJson(thing);
+              } else {
+                //parse item
+                return Item.fromJson(thing);
+              }
+            }),
+            List.from(Map.from(json['chargeSummary']).values));
+
   Map<String, dynamic> toJson() => {
         'key': key,
         'customer': customer.toJson(),
@@ -51,9 +55,12 @@ class Job {
         'poNumber': poNumber,
         'requisitioner': requisitioner,
         'location': location,
-        'stationCharges': jsonEncode(stationCharges),
-        'chargeSummary':
-            Map.fromIterable(chargeSummary.entries, key: (key) => key.toJson()),
+        'stationCharges': List.generate(
+            stationCharges.length, (index) => stationCharges[index].toJson()),
+        'chargeSummary': Map.fromIterables(
+            List.generate(chargeSummary.keys.length,
+                (index) => chargeSummary.keys.toList()[index].toJson()),
+            chargeSummary.values),
       };
 
   String dateSpan() {
