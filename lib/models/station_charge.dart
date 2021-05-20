@@ -1,11 +1,14 @@
 import 'dart:math';
 
+import 'package:easyinvoice/models/customer.dart';
 import 'package:easyinvoice/models/item.dart';
 import 'package:easyinvoice/models/service.dart';
 
+import 'job.dart';
+
 class StationCharge {
-  String leaseName;
-  String leaseNumber;
+  String meterName;
+  String meterNumber;
   DateTime jobDate;
   String notes;
   int billingField = 1;
@@ -14,8 +17,8 @@ class StationCharge {
   Map<Item, double> itemMap = Map();
 
   StationCharge(
-      {this.leaseNumber,
-      this.leaseName,
+      {this.meterNumber,
+      this.meterName,
       this.jobDate,
       this.notes,
       this.billingField,
@@ -25,8 +28,8 @@ class StationCharge {
     this.billingFieldName ??= '$billingField';
   }
   StationCharge.fromJson(Map<String, dynamic> json)
-      : leaseNumber = json['leaseNumber'],
-        leaseName = json['leaseName'],
+      : meterNumber = json['meterNumber'],
+        meterName = json['meterName'],
         jobDate = json['jobDate'],
         notes = json['notes'],
         billingField = json['billingField'],
@@ -45,8 +48,8 @@ class StationCharge {
             List.from(Map.from(json['itemMap']).values));
 
   Map<String, dynamic> toJson() => {
-        'leaseName': leaseName,
-        'leaseNumber': leaseNumber,
+        'meterName': meterName,
+        'meterNumber': meterNumber,
         'jobDate': jobDate,
         'notes': notes,
         'billingField': billingField,
@@ -66,6 +69,14 @@ class StationCharge {
     itemMap.forEach((key, value) {
       cost += key.price * value;
     });
+    return cost;
+  }
+
+  double serviceCost(Job job, String serviceCode) {
+    double cost = job.customer.priceMap['${serviceCode.toLowerCase()}'] *
+        serviceMap[serviceMap.keys
+            .firstWhere((key) => key.serviceCode == serviceCode)];
+
     return cost;
   }
 

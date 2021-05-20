@@ -98,7 +98,7 @@ class Invoice extends StatelessWidget {
                             child: SubHeader(job),
                           ),
                           InvoiceSummary(job),
-                          StationCharges(job),
+                          // StationCharges(job),
                         ],
                       ),
                     )),

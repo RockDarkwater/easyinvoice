@@ -8,7 +8,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:intl/intl.dart';
 
 class Job {
-  final UniqueKey key = UniqueKey();
+  UniqueKey key = UniqueKey();
   Customer customer;
   String techName;
   String poNumber;
@@ -27,7 +27,8 @@ class Job {
       this.chargeSummary});
 
   Job.fromJson(Map<String, dynamic> json)
-      : customer = Customer.fromJson(json['customer']),
+      : key = json['key'],
+        customer = Customer.fromJson(json['customer']),
         techName = json['techName'],
         poNumber = json['poNumber'],
         requisitioner = json['requisitioner'],
@@ -87,7 +88,7 @@ class Job {
 
     chargeSummary.forEach((key, value) {
       if (!key.isItem && !list.contains(key.name)) {
-        list.add('${key.name}');
+        list.add('${key.serviceCode}');
       }
     });
     if (stationCharges
@@ -98,6 +99,7 @@ class Job {
     if (jobTaxTotal() > 0) list.add('Tax');
     list.add('Total');
     list.add('Cost Center');
+    print(list);
     return list;
   }
 
@@ -135,6 +137,24 @@ class Job {
         });
       });
     }
+  }
+
+  summarize() {
+    chargeSummary.clear();
+
+    stationCharges.forEach((station) {
+      station.serviceMap.forEach((key, value) {
+        (chargeSummary?.keys?.toList()?.contains(key) ?? false)
+            ? chargeSummary[key] += value
+            : chargeSummary[key] = value;
+      });
+      station.itemMap.forEach((key, value) {
+        (chargeSummary?.keys?.toList()?.contains(key) ?? false)
+            ? chargeSummary[key] += value
+            : chargeSummary[key] = value;
+      });
+    });
+    print(chargeSummary);
   }
 
   double jobTaxTotal() {

@@ -106,7 +106,7 @@ class StationCharges extends StatelessWidget {
             list.add(Padding(
               padding: const EdgeInsets.all(8.0),
               child: Text(
-                '${charge.toJson()[header] ?? ''}',
+                '${charge.toJson()['meterName'] ?? ''}',
                 style: style,
               ),
             ));
@@ -115,7 +115,7 @@ class StationCharges extends StatelessWidget {
             list.add(Padding(
               padding: const EdgeInsets.all(8.0),
               child: Text(
-                '${charge.toJson()[header] ?? ''}',
+                '${charge.toJson()['meterNumber'] ?? ''}',
                 style: style,
               ),
             ));
@@ -124,7 +124,7 @@ class StationCharges extends StatelessWidget {
             list.add(Padding(
               padding: const EdgeInsets.all(8.0),
               child: Text(
-                '${charge.toJson()[header] ?? ''}',
+                '${DateFormat.yMd().format(charge.toJson()['jobDate']) ?? ''}',
                 style: style,
               ),
             ));
@@ -133,7 +133,7 @@ class StationCharges extends StatelessWidget {
             list.add(Padding(
               padding: const EdgeInsets.all(8.0),
               child: Text(
-                '${formatCurrency.format(charge.toJson()[header] ?? 0)}',
+                '${formatCurrency.format(charge.serviceCost(job, header) ?? 0)}',
                 style: style,
               ),
             ));

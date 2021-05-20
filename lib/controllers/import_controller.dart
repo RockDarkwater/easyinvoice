@@ -22,40 +22,52 @@ class ImportController extends GetxController {
   RxList<String> resultNames = <String>[''].obs;
 
   applyRules() {
-    //loop through jobs
-    int totalJobs = jobs.length;
-    int i = 0;
+    Map<String, dynamic> json;
+    int stationIteration;
+    bool changingCost = false;
 
-    print('applying rules');
-    for (i = 0; i < totalJobs; i++) {
-      print('$i out of $totalJobs');
-      print('jobs${jobs[i].customer.rules.length}');
+    jobs.forEach((job) {
+      json = job.toJson();
+      job.customer.rules.forEach((rule) {
+        if (json.containsKey(rule.boolField)) {
+          //test value
+          print('job level contains ${rule.boolField}');
+        } else {
+          // test station charges
+          job.stationCharges.forEach((station) {
+            (stationIteration == null)
+                ? stationIteration = 0
+                : stationIteration++;
+            json = station.toJson();
+            if (json.containsKey(rule.boolField)) {
+              //test value
+              print('station charge level contains ${rule.boolField}');
+            } else {
+              //test service map
+              job.stationCharges[stationIteration].serviceMap
+                  .forEach((key, value) {
+                json = key.toJson();
+                if (json.containsKey(rule.boolField)) {
+                  //test value
+                  print('service map level contains ${rule.boolField}');
+                } else {}
+              });
+              // test item map
+              job.stationCharges[stationIteration].itemMap
+                  .forEach((key, value) {
+                json = key.toJson();
+                if (json.containsKey(rule.boolField)) {
+                  //test value
+                  print('item map level contains ${rule.boolField}');
+                } else {}
+              });
+            }
+          });
+        }
+      });
 
-      // if job customer has a rule
-      if (jobs[i].customer.rules.length > 0) {
-        // convert job to json map
-        // jobs[i].customer.rules.forEach((rule) {
-        //   var json = List.generate(jobs[i].stationCharges.length,
-        //       (ind) => jobs[i].stationCharges[ind].toJson());
-        //   print(json);
-        //     Map custJson = Map.from(json['customer']);
-        //     Map stationJson = Map.from(json['stationCharges']);
-        //     Map chargeJson = Map.from(json['chargeSummary']);
-        //     // check rule test
-        //     if (json.containsKey(rule.boolField)) print(json.toString());
-        //     if (custJson.containsKey(rule.boolField)) print(custJson.toString());
-        //     if (stationJson.containsKey(rule.boolField))
-        //       print(stationJson.toString());
-        //     if (chargeJson.containsKey(rule.boolField))
-        //       print(chargeJson.toString());
-        // });
-      }
-      //convert job to json
-
-      //edit job
-
-      //replace job with job from edited json
-    }
+      //adjust charge summary to reflect rule changes. Maybe build charge summary post-import?
+    });
   }
 
   double countCustCharges(int custId) {
@@ -160,8 +172,8 @@ class ImportController extends GetxController {
     DateTime jobDate;
 
     //station charge variables
-    String leaseName;
-    String leaseNumber;
+    String meterName;
+    String meterNumber;
     String notes;
     print('looping through ${data.length} rows');
     processQty.value = data.length;
@@ -175,8 +187,8 @@ class ImportController extends GetxController {
       //get raw data
       techName = 'amis';
       location = data[i][17];
-      leaseName = data[i][5];
-      leaseNumber = data[i][4];
+      meterName = data[i][5];
+      meterNumber = data[i][4];
       notes = data[i][6];
       jobDate = DateTime.tryParse(date.replaceAll('_', '-'));
       cycle = int.tryParse(data[i][7]) ?? 0;
@@ -196,8 +208,8 @@ class ImportController extends GetxController {
             chargeSummary: {},
             stationCharges: [
               StationCharge(
-                leaseName: leaseName,
-                leaseNumber: leaseNumber,
+                meterName: meterName,
+                meterNumber: meterNumber,
                 jobDate: jobDate,
                 notes: notes,
                 serviceMap: {service: quantity},
@@ -211,11 +223,11 @@ class ImportController extends GetxController {
       // if job exists, check if station charge has been created.
       //  - if not, make it and then add the line charge.
       charge = job.stationCharges
-          .firstWhere((charge) => charge.leaseName == leaseName, orElse: () {
-        // print('new station charge job: $leaseName');
+          .firstWhere((charge) => charge.meterName == meterName, orElse: () {
+        // print('new station charge job: $meterName');
         newCharge = StationCharge(
-          leaseName: leaseName,
-          leaseNumber: leaseNumber,
+          meterName: meterName,
+          meterNumber: meterNumber,
           notes: notes,
           serviceMap: {service: quantity},
           itemMap: {},
@@ -235,15 +247,15 @@ class ImportController extends GetxController {
               .firstWhere((key) => key.name == service.name)] += 1
           : charge.serviceMap[service] = 1;
 
-      //add or update service in chargemap
-      (job.chargeSummary.keys
-                  .where((key) => key.name == service.name)
-                  .toList()
-                  .length >
-              0)
-          ? job.chargeSummary[job.chargeSummary.keys
-              .firstWhere((key) => key.name == service.name)] += 1
-          : job.chargeSummary[service] = 1;
+      // //add or update service in chargemap
+      // (job.chargeSummary.keys
+      //             .where((key) => key.name == service.name)
+      //             .toList()
+      //             .length >
+      //         0)
+      //     ? job.chargeSummary[job.chargeSummary.keys
+      //         .firstWhere((key) => key.name == service.name)] += 1
+      //     : job.chargeSummary[service] = 1;
     }
     processQty.value = 1;
     currentProcess.value = 0;
@@ -268,8 +280,8 @@ class ImportController extends GetxController {
     DateTime jobDate;
 
     //station charge variables
-    String leaseName;
-    String leaseNumber;
+    String meterName;
+    String meterNumber;
     String notes;
 
     processQty.value = data.maxRows;
@@ -284,8 +296,8 @@ class ImportController extends GetxController {
       location = data.cell(CellIndex.indexByString("AX$i")).value.toString();
       jobDate = DateTime.tryParse(
           data.cell(CellIndex.indexByString("I$i")).value.toString());
-      leaseName = data.cell(CellIndex.indexByString("F$i")).value.toString();
-      leaseNumber = data.cell(CellIndex.indexByString("D$i")).value.toString();
+      meterName = data.cell(CellIndex.indexByString("F$i")).value.toString();
+      meterNumber = data.cell(CellIndex.indexByString("D$i")).value.toString();
       notes = data.cell(CellIndex.indexByString("M$i")).value.toString();
       service = await getGasService(notes);
       customer = await parseCustomer(custNum);
@@ -305,10 +317,10 @@ class ImportController extends GetxController {
 
       //find or create station charge,
       charge = job.stationCharges.firstWhere(
-          (charge) => charge.leaseNumber == leaseNumber, orElse: () {
+          (charge) => charge.meterNumber == meterNumber, orElse: () {
         newCharge = StationCharge(
-          leaseName: leaseName,
-          leaseNumber: leaseNumber,
+          meterName: meterName,
+          meterNumber: meterNumber,
           jobDate: jobDate,
           notes: notes,
           serviceMap: {service: 0},
@@ -327,14 +339,14 @@ class ImportController extends GetxController {
           : charge.serviceMap[service] = 1;
 
       //add or update service in chargemap
-      (job.chargeSummary.keys
-                  .where((key) => key.name == service.name)
-                  .toList()
-                  .length >
-              0)
-          ? job.chargeSummary[job.chargeSummary.keys
-              .firstWhere((key) => key.name == service.name)] += 1
-          : job.chargeSummary[service] = 1;
+      // (job.chargeSummary.keys
+      //             .where((key) => key.name == service.name)
+      //             .toList()
+      //             .length >
+      //         0)
+      //     ? job.chargeSummary[job.chargeSummary.keys
+      //         .firstWhere((key) => key.name == service.name)] += 1
+      //     : job.chargeSummary[service] = 1;
     }
 
     processQty.value = 1;
@@ -398,15 +410,15 @@ class ImportController extends GetxController {
             itemMap[item] = double.tryParse(activeRow[j].toString()) ?? 0;
 
             //add item to summary map
-            (summaryMap.keys
-                        .where((key) => key.name == item.name)
-                        .toList()
-                        .length >
-                    0)
-                ? summaryMap[summaryMap.keys
-                        .firstWhere((key) => key.name == item.name)] +=
-                    itemMap[item]
-                : summaryMap[item] = itemMap[item];
+            // (summaryMap.keys
+            //             .where((key) => key.name == item.name)
+            //             .toList()
+            //             .length >
+            //         0)
+            //     ? summaryMap[summaryMap.keys
+            //             .firstWhere((key) => key.name == item.name)] +=
+            //         itemMap[item]
+            //     : summaryMap[item] = itemMap[item];
             // print('item: ${item.name} added, x${itemMap[item]}');
           } else if (isService) {
             // get Service
@@ -416,15 +428,15 @@ class ImportController extends GetxController {
             // add service to summary map
 
             //add item to summary map
-            (summaryMap.keys
-                        .where((key) => key.name == service.name)
-                        .toList()
-                        .length >
-                    0)
-                ? summaryMap[summaryMap.keys
-                        .firstWhere((key) => key.name == service.name)] +=
-                    serviceMap[service]
-                : summaryMap[service] = serviceMap[service];
+            // (summaryMap.keys
+            //             .where((key) => key.name == service.name)
+            //             .toList()
+            //             .length >
+            //         0)
+            //     ? summaryMap[summaryMap.keys
+            //             .firstWhere((key) => key.name == service.name)] +=
+            //         serviceMap[service]
+            //     : summaryMap[service] = serviceMap[service];
           }
 
           // print(
@@ -434,8 +446,8 @@ class ImportController extends GetxController {
       }
       // print('creating charge...');
       stationCharges.add(StationCharge(
-        leaseNumber: activeRow[0].toString(),
-        leaseName: activeRow[1].toString(),
+        meterNumber: activeRow[0].toString(),
+        meterName: activeRow[1].toString(),
         jobDate: jobDate,
         notes: activeRow[2].toString(),
         itemMap: Map.of(itemMap),

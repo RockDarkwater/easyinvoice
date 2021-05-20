@@ -25,8 +25,8 @@ Future<void> testJob() async {
       techName: 'Johnny Horton',
       stationCharges: [
         StationCharge(
-            leaseName: 'Test Lease 1',
-            leaseNumber: '12345',
+            meterName: 'Test Lease 1',
+            meterNumber: '12345',
             jobDate: DateTime(2021, 4, 1),
             serviceMap: {
               cal: 1,
@@ -37,8 +37,8 @@ Future<void> testJob() async {
               plate: 2
             }),
         StationCharge(
-          leaseName: 'Test Lease 2',
-          leaseNumber: '23456',
+          meterName: 'Test Lease 2',
+          meterNumber: '23456',
           jobDate: DateTime(2021, 4, 2),
           serviceMap: {
             cal: 1,
@@ -47,12 +47,7 @@ Future<void> testJob() async {
           itemMap: {},
         ),
       ],
-      chargeSummary: {
-        cal: 2,
-        gas: 4,
-        liquid: 6,
-        plate: 2
-      }));
+      chargeSummary: {}));
   controller.jobs.last.priceServices();
 
   cust = await controller.parseCustomer('250');
@@ -65,20 +60,20 @@ Future<void> testJob() async {
       techName: 'Jim Hortons',
       stationCharges: [
         StationCharge(
-            leaseName: 'Test Lease 2',
-            leaseNumber: '22233',
+            meterName: 'Test Lease 2',
+            meterNumber: '22233',
             jobDate: DateTime(2021, 4, 15),
             serviceMap: {
-              cal: 1,
+              cal: 5,
               gas: 1,
-              liquid: 6,
+              liquid: 2,
             },
             itemMap: {
-              plate: 2
+              plate: 1
             }),
         StationCharge(
-          leaseName: 'Test Lease 5',
-          leaseNumber: '556677',
+          meterName: 'Test Lease 5',
+          meterNumber: '556677',
           jobDate: DateTime(2021, 4, 7),
           serviceMap: {
             cal: 1,
@@ -87,20 +82,19 @@ Future<void> testJob() async {
           itemMap: {},
         ),
       ],
-      chargeSummary: {
-        cal: 2,
-        gas: 4,
-        liquid: 6,
-        plate: 2
-      }));
+      chargeSummary: {}));
 
   controller.compileParents();
-  controller.jobs.forEach((job) => job.priceServices());
+  controller.jobs.forEach((job) {
+    job.priceServices();
+    job.summarize();
+  });
   controller.applyRules();
 
   Job test = Job.fromJson(controller.jobs.first.toJson());
   try {
     print(test.toJson());
+    print(controller.jobs.first.toJson());
   } catch (err) {
     print('$err');
   }
