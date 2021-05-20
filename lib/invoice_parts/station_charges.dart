@@ -51,6 +51,7 @@ class StationCharges extends StatelessWidget {
   List<Widget> chargeBody() {
     List<Widget> body = [];
     List<String> headers = job.headerRow();
+    String headerName;
     List<Widget> list;
     TextStyle style = TextStyle(
       fontSize: 12,
@@ -59,11 +60,13 @@ class StationCharges extends StatelessWidget {
 
     headers.forEach((header) {
       list = [];
+      (header.indexOf(' ') > 0 && header != 'Cost Center')
+          ? headerName = header.substring(0, header.indexOf(' '))
+          : headerName = header;
       list.add(Padding(
         padding: const EdgeInsets.all(8.0),
-        child: Text('$header'),
+        child: Text('$headerName'),
       ));
-
       job.stationCharges.forEach((charge) {
         switch ('$header') {
           case 'Parts':
@@ -129,11 +132,11 @@ class StationCharges extends StatelessWidget {
               ),
             ));
             break;
-          default:
+          default: // services
             list.add(Padding(
               padding: const EdgeInsets.all(8.0),
               child: Text(
-                '${formatCurrency.format(charge.serviceCost(job, header) ?? 0)}',
+                '${formatCurrency.format(charge.serviceCost(header))}',
                 style: style,
               ),
             ));

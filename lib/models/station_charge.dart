@@ -72,11 +72,21 @@ class StationCharge {
     return cost;
   }
 
-  double serviceCost(Job job, String serviceCode) {
-    double cost = job.customer.priceMap['${serviceCode.toLowerCase()}'] *
-        serviceMap[serviceMap.keys
-            .firstWhere((key) => key.serviceCode == serviceCode)];
-
+  double serviceCost(String header) {
+    double cost = 0;
+    print('testing $header on $meterName');
+    Service service = serviceMap?.keys
+        ?.firstWhere((element) => element.name == header, orElse: () => null);
+    if (service == null) {
+      print('null service $header');
+    } else {
+      print(service.toJson());
+      cost = service.price *
+              serviceMap[serviceMap?.keys
+                  ?.firstWhere((element) => element.name == header)] ??
+          0;
+    }
+    print('returning cost $cost');
     return cost;
   }
 

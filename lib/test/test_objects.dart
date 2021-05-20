@@ -93,8 +93,8 @@ Future<void> testJob() async {
 
   Job test = Job.fromJson(controller.jobs.first.toJson());
   try {
-    print(test.toJson());
-    print(controller.jobs.first.toJson());
+    // print(test.toJson());
+    // print(controller.jobs.first.toJson());
   } catch (err) {
     print('$err');
   }

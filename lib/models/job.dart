@@ -88,7 +88,7 @@ class Job {
 
     chargeSummary.forEach((key, value) {
       if (!key.isItem && !list.contains(key.name)) {
-        list.add('${key.serviceCode}');
+        list.add('${key.name}');
       }
     });
     if (stationCharges
@@ -99,7 +99,6 @@ class Job {
     if (jobTaxTotal() > 0) list.add('Tax');
     list.add('Total');
     list.add('Cost Center');
-    print(list);
     return list;
   }
 
@@ -154,7 +153,6 @@ class Job {
             : chargeSummary[key] = value;
       });
     });
-    print(chargeSummary);
   }
 
   double jobTaxTotal() {
