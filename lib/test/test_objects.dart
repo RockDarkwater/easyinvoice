@@ -7,7 +7,7 @@ import 'package:easyinvoice/models/service.dart';
 import 'package:easyinvoice/models/station_charge.dart';
 import 'package:get/get.dart';
 
-Future<void> testJob() async {
+Future<bool> testJob() async {
   ImportController controller = Get.find();
   FireBaseController controllerF = Get.find();
 
@@ -91,11 +91,12 @@ Future<void> testJob() async {
   });
   controller.applyRules();
 
-  Job test = Job.fromJson(controller.jobs.first.toJson());
+  // Job test = Job.fromJson(controller.jobs.first.toJson());
   try {
     // print(test.toJson());
     // print(controller.jobs.first.toJson());
   } catch (err) {
     print('$err');
   }
+  return true;
 }

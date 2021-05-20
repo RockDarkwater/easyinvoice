@@ -143,13 +143,21 @@ class Job {
 
     stationCharges.forEach((station) {
       station.serviceMap.forEach((key, value) {
-        (chargeSummary?.keys?.toList()?.contains(key) ?? false)
-            ? chargeSummary[key] += value
+        (chargeSummary.keys.firstWhere((element) => element.name == key.name,
+                    orElse: () => null) !=
+                null)
+            ? chargeSummary[chargeSummary.keys
+                .firstWhere((element) => element.name == key.name)] += value
             : chargeSummary[key] = value;
       });
+    });
+    stationCharges.forEach((station) {
       station.itemMap.forEach((key, value) {
-        (chargeSummary?.keys?.toList()?.contains(key) ?? false)
-            ? chargeSummary[key] += value
+        (chargeSummary.keys.firstWhere((element) => element.name == key.name,
+                    orElse: () => null) !=
+                null)
+            ? chargeSummary[chargeSummary.keys
+                .firstWhere((element) => element.name == key.name)] += value
             : chargeSummary[key] = value;
       });
     });

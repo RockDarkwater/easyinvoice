@@ -1,10 +1,6 @@
 import 'dart:math';
-
-import 'package:easyinvoice/models/customer.dart';
 import 'package:easyinvoice/models/item.dart';
 import 'package:easyinvoice/models/service.dart';
-
-import 'job.dart';
 
 class StationCharge {
   String meterName;
@@ -49,7 +45,7 @@ class StationCharge {
 
   Map<String, dynamic> toJson() => {
         'meterName': meterName,
-        'meterNumber': meterNumber,
+        'meterNumber': (meterNumber == 'null') ? '' : meterNumber,
         'jobDate': jobDate,
         'notes': notes,
         'billingField': billingField,
@@ -74,19 +70,15 @@ class StationCharge {
 
   double serviceCost(String header) {
     double cost = 0;
-    print('testing $header on $meterName');
     Service service = serviceMap?.keys
         ?.firstWhere((element) => element.name == header, orElse: () => null);
-    if (service == null) {
-      print('null service $header');
-    } else {
-      print(service.toJson());
+    if (service != null) {
+      // print(service.toJson());
       cost = service.price *
               serviceMap[serviceMap?.keys
                   ?.firstWhere((element) => element.name == header)] ??
           0;
     }
-    print('returning cost $cost');
     return cost;
   }
 

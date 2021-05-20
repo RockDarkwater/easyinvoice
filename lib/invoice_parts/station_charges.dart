@@ -15,36 +15,28 @@ class StationCharges extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: uiController.invWidth.value,
-      child: Column(
-        children: [
-          Container(
-            child: Stack(children: [
-              Padding(
-                padding: const EdgeInsets.only(top: 37.5),
-                child: Column(
-                    children: List<Widget>.generate(
-                        job.stationCharges.length,
-                        (index) => Container(
-                            height: 30,
-                            color: (index % 2 == 0)
-                                ? Colors.black12
-                                : Colors.white))),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(top: 4.0, bottom: 2.0),
-                child: FittedBox(
-                  fit: BoxFit.fitWidth,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: chargeBody(),
-                  ),
-                ),
-              ),
-            ]),
+      child: Stack(children: [
+        Padding(
+            padding: const EdgeInsets.only(top: 37.5),
+            child: Column(
+                children: List<Widget>.generate(
+              job.stationCharges.length,
+              (index) => Container(
+                  height: 30,
+                  color: (index % 2 == 0) ? Colors.black12 : Colors.white),
+            ))),
+        Padding(
+          padding: const EdgeInsets.only(top: 4.0, bottom: 2.0),
+          child: FittedBox(
+            fit: BoxFit.fitWidth,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: chargeBody(),
+            ),
           ),
-        ],
-      ),
+        ),
+      ]),
     );
   }
 
@@ -70,13 +62,15 @@ class StationCharges extends StatelessWidget {
       job.stationCharges.forEach((charge) {
         switch ('$header') {
           case 'Parts':
-            list.add(Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Text(
-                '${formatCurrency.format(charge.partCost())}',
-                style: style,
+            list.add(
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text(
+                  '${formatCurrency.format(charge.partCost())}',
+                  style: style,
+                ),
               ),
-            ));
+            );
             break;
           case 'Tax':
             list.add(Padding(

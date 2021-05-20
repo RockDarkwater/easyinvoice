@@ -6,6 +6,8 @@ import 'package:easyinvoice/models/item.dart';
 import 'package:easyinvoice/models/job.dart';
 import 'package:easyinvoice/models/service.dart';
 import 'package:easyinvoice/models/station_charge.dart';
+import 'package:easyinvoice/screens/importing.dart';
+import 'package:easyinvoice/screens/upload.dart';
 import 'package:excel/excel.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/cupertino.dart';
@@ -100,11 +102,15 @@ class ImportController extends GetxController {
     });
   }
 
-  Future<void> import() async {
+  Future<bool> import() async {
     print('starting import.');
     FilePickerResult result =
         await FilePicker.platform.pickFiles(allowMultiple: true);
 
+    if (result.names.any((element) => element.contains('.csv'))) {
+      Get.offAll(UploadScreen(), transition: Transition.noTransition);
+      return false;
+    }
     resultNames.replaceRange(0, resultNames.length - 1, result.names);
     List<List<String>> txtFile;
     List<String> rows;
@@ -148,8 +154,10 @@ class ImportController extends GetxController {
     compileParents();
     jobs.forEach((job) {
       job.priceServices();
+      job.summarize();
     });
-    applyRules();
+    return true;
+    // applyRules();
   }
 
   Future<void> buildAmisJobs(List<List<String>> data, String date) async {

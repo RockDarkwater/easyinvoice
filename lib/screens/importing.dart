@@ -24,10 +24,12 @@ class ImportingScreen extends StatelessWidget {
         ),
       ),
       body: FutureBuilder(
-        future: testJob(), // controller.import(), //
+        future: testJob(), //controller.import(), //
         builder: (context, snapshot) {
           print(snapshot.connectionState.toString());
-          while (snapshot.connectionState != ConnectionState.done) {
+          print(snapshot.data.toString());
+
+          while (!snapshot.hasData) {
             controller.importQty.value = 1;
             controller.currentImport.value = 0;
             controller.currentProcess.value = 0;
@@ -37,7 +39,11 @@ class ImportingScreen extends StatelessWidget {
             return LoadingScreen();
           }
           //Batch Screen
-          return BatchScreen();
+          if (snapshot.data.toString() == 'true') {
+            return BatchScreen();
+          } else {
+            return Container();
+          }
         },
       ),
     );
