@@ -14,135 +14,112 @@ class StationCharges extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: uiController.invWidth.value,
-      child: Stack(children: [
-        Padding(
-            padding: const EdgeInsets.only(top: 37.5),
-            child: Column(
-                children: List<Widget>.generate(
-              job.stationCharges.length,
-              (index) => Container(
-                  height: 30,
-                  color: (index % 2 == 0) ? Colors.black12 : Colors.white),
-            ))),
-        Padding(
-          padding: const EdgeInsets.only(top: 4.0, bottom: 2.0),
-          child: FittedBox(
-            fit: BoxFit.fitWidth,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: chargeBody(),
-            ),
+        width: uiController.invWidth.value,
+        child: FittedBox(
+          fit: BoxFit.fitWidth,
+          child: DataTable(
+            dataRowHeight: 20,
+            dividerThickness: 3,
+            columns: List.generate(job.headerRow().length, (index) {
+              return DataColumn(label: Text('${job.headerRow()[index]}'));
+            }),
+            rows: buildRows(),
           ),
-        ),
-      ]),
-    );
+        ));
   }
 
-  List<Widget> chargeBody() {
-    List<Widget> body = [];
+  List<DataRow> buildRows() {
+    List<DataRow> list = [];
+    List<DataCell> rowList = [];
     List<String> headers = job.headerRow();
-    String headerName;
-    List<Widget> list;
-    TextStyle style = TextStyle(
-      fontSize: 12,
-    );
-    Column column;
 
-    headers.forEach((header) {
-      list = [];
-      (header.indexOf(' ') > 0 && header != 'Cost Center')
-          ? headerName = header.substring(0, header.indexOf(' '))
-          : headerName = header;
-      list.add(Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Text('$headerName'),
-      ));
-      job.stationCharges.forEach((charge) {
+    TextStyle style = TextStyle();
+
+    job.stationCharges.forEach((charge) {
+      rowList = [];
+      headers.forEach((header) {
         switch ('$header') {
           case 'Parts':
-            list.add(
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Text(
-                  '${formatCurrency.format(charge.partCost())}',
-                  style: style,
+            rowList.add(
+              DataCell(
+                Padding(
+                  padding: const EdgeInsets.all(2.0),
+                  child: Text(
+                    '${formatCurrency.format(charge.partCost())}',
+                    style: style,
+                  ),
                 ),
               ),
             );
             break;
           case 'Tax':
-            list.add(Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Text(
-                '${formatCurrency.format(charge.taxableAmount(job?.customer?.taxRate ?? 8.25))}',
-                style: style,
+            rowList.add(DataCell(
+              Padding(
+                padding: const EdgeInsets.all(2.0),
+                child: Text(
+                  '${formatCurrency.format(charge.taxableAmount(job?.customer?.taxRate ?? 8.25))}',
+                  style: style,
+                ),
               ),
             ));
             break;
           case 'Total':
-            list.add(Padding(
-              padding: const EdgeInsets.all(8.0),
+            rowList.add(DataCell(Padding(
+              padding: const EdgeInsets.all(2.0),
               child: Text(
                 '${formatCurrency.format(charge.totalCharge() + (charge.taxableAmount(job?.customer?.taxRate ?? 8.25)))}',
                 style: style,
               ),
-            ));
+            )));
             break;
           case 'Cost Center':
-            list.add(Padding(
-              padding: const EdgeInsets.all(8.0),
+            rowList.add(DataCell(Padding(
+              padding: const EdgeInsets.all(2.0),
               child: Text(
                 '',
                 style: style,
               ),
-            ));
+            )));
             break;
           case 'Name':
-            list.add(Padding(
-              padding: const EdgeInsets.all(8.0),
+            rowList.add(DataCell(Padding(
+              padding: const EdgeInsets.all(2.0),
               child: Text(
                 '${charge.toJson()['meterName'] ?? ''}',
                 style: style,
               ),
-            ));
+            )));
             break;
           case 'Number':
-            list.add(Padding(
-              padding: const EdgeInsets.all(8.0),
+            rowList.add(DataCell(Padding(
+              padding: const EdgeInsets.all(2.0),
               child: Text(
                 '${charge.toJson()['meterNumber'] ?? ''}',
                 style: style,
               ),
-            ));
+            )));
             break;
           case 'Date':
-            list.add(Padding(
-              padding: const EdgeInsets.all(8.0),
+            rowList.add(DataCell(Padding(
+              padding: const EdgeInsets.all(2.0),
               child: Text(
                 '${DateFormat.yMd().format(charge.toJson()['jobDate']) ?? ''}',
                 style: style,
               ),
-            ));
+            )));
             break;
           default: // services
-            list.add(Padding(
-              padding: const EdgeInsets.all(8.0),
+            rowList.add(DataCell(Padding(
+              padding: const EdgeInsets.all(2.0),
               child: Text(
                 '${formatCurrency.format(charge.serviceCost(header))}',
                 style: style,
               ),
-            ));
+            )));
         }
       });
-
-      column = Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: list,
-      );
-      body.add(column);
+      list.add(DataRow(cells: rowList));
     });
-    return body;
+    return list;
   }
 }

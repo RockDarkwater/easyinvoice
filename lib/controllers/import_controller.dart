@@ -111,7 +111,8 @@ class ImportController extends GetxController {
       Get.offAll(UploadScreen(), transition: Transition.noTransition);
       return false;
     }
-    resultNames.replaceRange(0, resultNames.length - 1, result.names);
+    resultNames.clear();
+    resultNames.addAll(result.names);
     List<List<String>> txtFile;
     List<String> rows;
     Excel book;

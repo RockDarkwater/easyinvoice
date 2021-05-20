@@ -25,7 +25,7 @@ Future<bool> testJob() async {
       techName: 'Johnny Horton',
       stationCharges: [
         StationCharge(
-            meterName: 'Test Lease 1',
+            meterName: 'Test Lease 1 that\'s really long',
             meterNumber: '12345',
             jobDate: DateTime(2021, 4, 1),
             serviceMap: {
@@ -66,11 +66,8 @@ Future<bool> testJob() async {
             serviceMap: {
               cal: 5,
               gas: 1,
-              liquid: 2,
             },
-            itemMap: {
-              plate: 1
-            }),
+            itemMap: {}),
         StationCharge(
           meterName: 'Test Lease 5',
           meterNumber: '556677',
