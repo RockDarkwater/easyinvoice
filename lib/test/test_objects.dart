@@ -50,7 +50,7 @@ Future<bool> testJob() async {
       chargeSummary: {}));
   controller.jobs.last.priceServices();
 
-  cust = await controller.parseCustomer('250');
+  cust = await controller.parseCustomer('8093NM');
 
   controller.jobs.add(Job(
       customer: cust,

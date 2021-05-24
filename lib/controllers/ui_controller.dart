@@ -8,7 +8,7 @@ import 'package:get/get.dart';
 class UIController extends GetxController {
   final invView = false.obs;
   final currentJob = Job().obs;
-  final currentJobNum = 0.obs;
+  final currentJobNum = 1.obs;
   final currentJobs = <Job>[].obs;
   final screenSize = Size(0, 0).obs;
   final invWidth = 0.0.obs;
@@ -35,16 +35,16 @@ class UIController extends GetxController {
     //increment index number in current jobs
     print('Moving Jobs');
     if (backward) {
-      (currentJobNum.value > 0)
+      (currentJobNum.value > 1)
           ? currentJobNum.value--
-          : currentJobNum.value = currentJobs.length - 1;
+          : currentJobNum.value = currentJobs.length;
     } else {
-      (currentJobNum.value < currentJobs.length - 1)
+      (currentJobNum.value < currentJobs.length)
           ? currentJobNum.value++
-          : currentJobNum.value = 0;
+          : currentJobNum.value = 1;
     }
 
-    currentJob.value = currentJobs[currentJobNum.value];
+    currentJob.value = currentJobs[currentJobNum.value - 1];
   }
 
   setSizes(BuildContext context) {

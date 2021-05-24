@@ -1,3 +1,4 @@
+import 'package:easyinvoice/controllers/import_controller.dart';
 import 'package:easyinvoice/controllers/ui_controller.dart';
 import 'package:easyinvoice/models/job.dart';
 import 'package:flutter/material.dart';
@@ -5,6 +6,7 @@ import 'package:get/get.dart';
 
 class InvoiceHeader extends StatelessWidget {
   final UIController uiController = Get.find();
+  final ImportController controller = Get.find();
   final AssetImage howard = AssetImage('assets/logo.png');
   final Job job;
   final TextStyle remitStyle =
@@ -63,7 +65,7 @@ class InvoiceHeader extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.only(top: 15.0, right: 20.0),
                 child: Text(
-                  'Page 1 of 1',
+                  'Invoice ${uiController.currentJobNum} of ${uiController.currentJobs.length}',
                   textAlign: TextAlign.left,
                   style: remitStyle,
                 ),
