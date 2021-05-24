@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easyinvoice/controllers/firebase_controller.dart';
 import 'package:easyinvoice/models/customer.dart';
@@ -6,7 +7,6 @@ import 'package:easyinvoice/models/item.dart';
 import 'package:easyinvoice/models/job.dart';
 import 'package:easyinvoice/models/service.dart';
 import 'package:easyinvoice/models/station_charge.dart';
-import 'package:easyinvoice/screens/importing.dart';
 import 'package:easyinvoice/screens/upload.dart';
 import 'package:excel/excel.dart';
 import 'package:file_picker/file_picker.dart';
@@ -133,6 +133,8 @@ class ImportController extends GetxController {
         });
         date = result.files[i].name;
         date = date.substring(date.indexOf('_') + 1, date.indexOf('.'));
+        if (date.contains(' ')) date = date.substring(0, date.indexOf(' '));
+        date = date.replaceAll('_', '');
         print(date);
         await buildAmisJobs(txtFile, date);
       } else if (result.files[i].name.contains('.xls')) {
@@ -178,7 +180,7 @@ class ImportController extends GetxController {
     Customer customer;
     String techName;
     String location;
-    DateTime jobDate;
+    DateTime jobDate = DateTime.tryParse(date.trim());
 
     //station charge variables
     String meterName;
@@ -199,7 +201,6 @@ class ImportController extends GetxController {
       meterName = data[i][5];
       meterNumber = data[i][4];
       notes = data[i][6];
-      jobDate = DateTime.tryParse(date.replaceAll('_', '-'));
       cycle = int.tryParse(data[i][7]) ?? 0;
       orifice = !notes.contains('EGM');
       quantity = double.tryParse(data[i][11]) ?? 0;
@@ -237,6 +238,7 @@ class ImportController extends GetxController {
         newCharge = StationCharge(
           meterName: meterName,
           meterNumber: meterNumber,
+          jobDate: jobDate,
           notes: notes,
           serviceMap: {service: quantity},
           itemMap: {},

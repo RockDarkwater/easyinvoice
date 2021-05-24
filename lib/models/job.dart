@@ -65,12 +65,16 @@ class Job {
       };
 
   String dateSpan() {
-    DateTime minDate = DateTime(3500, 1, 1);
-    DateTime maxDate = DateTime(1900, 1, 1);
+    DateTime minDate = DateTime(2050, 1, 1);
+    DateTime maxDate = DateTime(2000, 1, 1);
 
     stationCharges.forEach((charge) {
-      if (charge.jobDate.isBefore(minDate)) minDate = charge.jobDate;
-      if (charge.jobDate.isAfter(maxDate)) maxDate = charge.jobDate;
+      try {
+        if (charge.jobDate.isBefore(minDate)) minDate = charge.jobDate;
+        if (charge.jobDate.isAfter(maxDate)) maxDate = charge.jobDate;
+      } catch (err) {
+        //same date
+      }
     });
 
     if (minDate != maxDate) {
@@ -189,35 +193,19 @@ class Job {
   String jobSummary() {
     String string = '';
 
-    if (stationCharges
-            .where((charge) =>
-                charge.serviceMap.keys
-                    .where((service) => service.category == "Field Work")
-                    .length >
-                0)
-            .length >
-        0) string = '$string/Field Work';
+    stationCharges.forEach((station) {
+      station.serviceMap.keys.forEach((service) {
+        if (service.category == "Field Work" && !string.contains('/Field Work'))
+          string = '$string/Field Work';
+        if (service.category == "Analysis" && !string.contains('/Analysis'))
+          string = '$string/Analysis';
+        if (service.category == "Volumes" && !string.contains('/Volumes'))
+          string = '$string/Volumes';
+      });
 
-    if (stationCharges
-            .where((charge) =>
-                charge.serviceMap.keys
-                    .where((service) => service.category == "Analysis")
-                    .length >
-                0)
-            .length >
-        0) string = '$string/Analysis';
-
-    if (stationCharges
-            .where((charge) =>
-                charge.serviceMap.keys
-                    .where((service) => service.category == "Volumes")
-                    .length >
-                0)
-            .length >
-        0) string = '$string/Volumes';
-
-    if (stationCharges.where((charge) => charge.itemMap.length > 0).length > 0)
-      string = '$string/Resale';
+      if (station.itemMap.length > 0 && !string.contains('/Resale'))
+        string = '$string/Resale';
+    });
 
     return string.substring(1);
   }
