@@ -7,6 +7,8 @@ import 'package:easyinvoice/models/station_charge.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:intl/intl.dart';
 
+import 'rule.dart';
+
 class Job {
   UniqueKey key = UniqueKey();
   Customer customer;
@@ -63,6 +65,47 @@ class Job {
                 (index) => chargeSummary.keys.toList()[index].toJson()),
             chargeSummary.values),
       };
+
+  Map<bool, String> checkRule(String fieldName, String val) {
+    Map<String, dynamic> json;
+    Map<bool, String> checkResponse = Map();
+    bool ruleApplies = false;
+    json = this.toJson();
+    if (json.containsKey(fieldName)) {
+      //rule checks job level
+      ruleApplies = json['$fieldName'] == val || val == '*';
+      checkResponse[ruleApplies] = 'Job';
+    } else {
+      json = stationCharges.first.toJson();
+      if (json.containsKey(fieldName)) {
+        //rule checks station charge level
+        ruleApplies = json['$fieldName'] == val || val == '*';
+        checkResponse[ruleApplies] = 'Station';
+      } else {
+        stationCharges.forEach((station) {
+          station.serviceMap.forEach((key, value) {
+            json = key.toJson();
+            if (json.containsKey(fieldName)) {
+              //rule checks service level
+              ruleApplies = json['$fieldName'] == val || val == '*';
+              checkResponse[ruleApplies] = 'Service';
+            } else {}
+          });
+
+          station.itemMap.forEach((key, value) {
+            json = key.toJson();
+            if (json.containsKey(fieldName)) {
+              //rule checks service level
+              ruleApplies = json['$fieldName'] == val || val == '*';
+              checkResponse[ruleApplies] = 'Item';
+            } else {}
+          });
+        });
+      }
+    }
+    print(checkResponse);
+    return checkResponse;
+  }
 
   String dateSpan() {
     DateTime minDate = DateTime(2050, 1, 1);

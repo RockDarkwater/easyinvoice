@@ -1,8 +1,10 @@
 import 'dart:math';
 import 'package:easyinvoice/models/item.dart';
 import 'package:easyinvoice/models/service.dart';
+import 'package:flutter/cupertino.dart';
 
 class StationCharge {
+  UniqueKey key = UniqueKey();
   String meterName;
   String meterNumber;
   DateTime jobDate;
@@ -24,7 +26,8 @@ class StationCharge {
     this.billingFieldName ??= '$billingField';
   }
   StationCharge.fromJson(Map<String, dynamic> json)
-      : meterNumber = json['meterNumber'],
+      : key = json['key'],
+        meterNumber = json['meterNumber'],
         meterName = json['meterName'],
         jobDate = json['jobDate'],
         notes = json['notes'],
@@ -44,6 +47,7 @@ class StationCharge {
             List.from(Map.from(json['itemMap']).values));
 
   Map<String, dynamic> toJson() => {
+        'key': key,
         'meterName': meterName,
         'meterNumber': (meterNumber == 'null') ? '' : meterNumber,
         'jobDate': jobDate,

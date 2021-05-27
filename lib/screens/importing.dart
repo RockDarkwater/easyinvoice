@@ -26,9 +26,6 @@ class ImportingScreen extends StatelessWidget {
       body: FutureBuilder(
         future: testJob(), //controller.import(), //
         builder: (context, snapshot) {
-          print(snapshot.connectionState.toString());
-          print(snapshot.data.toString());
-
           while (!snapshot.hasData) {
             controller.importQty.value = 1;
             controller.currentImport.value = 0;

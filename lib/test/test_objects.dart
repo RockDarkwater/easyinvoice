@@ -14,6 +14,7 @@ Future<bool> testJob() async {
   Service gas = await controller.getGasService('Spot');
   Service liquid = await controller.getGasService('liquid');
   Service cal = await controllerF.getService('calibration');
+  Service travel = await controllerF.getService('travelTime');
   Item plate = await controllerF.getItem('MPU2-0002');
   Customer cust = await controller.parseCustomer('8093');
 
@@ -30,6 +31,7 @@ Future<bool> testJob() async {
             jobDate: DateTime(2021, 4, 1),
             serviceMap: {
               cal: 1,
+              travel: 1.2,
               gas: 1,
               liquid: 6,
             },
@@ -82,11 +84,11 @@ Future<bool> testJob() async {
       chargeSummary: {}));
 
   controller.compileParents();
+  controller.applyRules();
   controller.jobs.forEach((job) {
     job.priceServices();
     job.summarize();
   });
-  controller.applyRules();
 
   // Job test = Job.fromJson(controller.jobs.first.toJson());
   try {

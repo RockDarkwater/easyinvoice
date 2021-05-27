@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easyinvoice/controllers/firebase_controller.dart';
 import 'package:easyinvoice/models/customer.dart';
@@ -24,51 +23,38 @@ class ImportController extends GetxController {
   RxList<String> resultNames = <String>[''].obs;
 
   applyRules() {
+    Map<bool, String> checkVal;
     Map<String, dynamic> json;
-    int stationIteration;
-    bool changingCost = false;
+    int jobIndex;
+    int stationIndex;
+    List<dynamic> iterable;
 
     jobs.forEach((job) {
-      json = job.toJson();
+      jobIndex = jobs.indexWhere((element) => element.key == job.key);
       job.customer.rules.forEach((rule) {
-        if (json.containsKey(rule.boolField)) {
-          //test value
-          print('job level contains ${rule.boolField}');
+        checkVal = job.checkRule(rule.boolField, rule.boolValue);
+        if (checkVal.containsKey(true)) {
+          print('checkval: ${checkVal[true]}');
+          switch (checkVal[true]) {
+            case 'Job':
+              print('rule: $rule tests job level');
+              break;
+            case 'Station':
+              print('rule: $rule tests station level');
+              break;
+            case 'Service':
+              print('rule: $rule tests service level');
+              break;
+            case 'Item':
+              print('rule: $rule tests service level');
+              break;
+            default:
+              print('rule: $rule tests ${checkVal[true]}');
+          }
         } else {
-          // test station charges
-          job.stationCharges.forEach((station) {
-            (stationIteration == null)
-                ? stationIteration = 0
-                : stationIteration++;
-            json = station.toJson();
-            if (json.containsKey(rule.boolField)) {
-              //test value
-              print('station charge level contains ${rule.boolField}');
-            } else {
-              //test service map
-              job.stationCharges[stationIteration].serviceMap
-                  .forEach((key, value) {
-                json = key.toJson();
-                if (json.containsKey(rule.boolField)) {
-                  //test value
-                  print('service map level contains ${rule.boolField}');
-                } else {}
-              });
-              // test item map
-              job.stationCharges[stationIteration].itemMap
-                  .forEach((key, value) {
-                json = key.toJson();
-                if (json.containsKey(rule.boolField)) {
-                  //test value
-                  print('item map level contains ${rule.boolField}');
-                } else {}
-              });
-            }
-          });
+          print('rule: $rule does not apply');
         }
       });
-
-      //adjust charge summary to reflect rule changes. Maybe build charge summary post-import?
     });
   }
 
